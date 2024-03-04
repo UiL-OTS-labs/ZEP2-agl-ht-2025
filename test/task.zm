@@ -1,0 +1,133 @@
+/******************************************************************************\
+FILE:           task.zm
+AUTHOR:         Theo Veenker <theo.veenker@beexy.nl>
+ADAPTED BY:     -
+
+DESCRIPTION:
+
+Defines the global procedure for this experiment phase.
+
+
+Global structure of this experiment phase:
+
+  - test part
+      trial
+        subtrial
+
+
+HISTORY:
+2012-02-20 TV   Created.
+2017-05-26 TV   Adapted for Zep 2.0.
+
+\******************************************************************************/
+
+
+import defs;
+import stimuli;
+import output;
+import test_handler;
+
+
+const int BUTTON_GO     = 2;
+const int BUTTON_HALT   = 0;
+const int BUTTON_REPEAT = 1;
+const int BUTTON_ATTENTION = 1;
+
+// Test item table.
+TestItem[..] test_items;
+
+Block task
+{
+    Block test
+    {
+        TestItem    item;           // current item
+
+
+        on_event:entry()
+        {
+            num_cycles = test_items.size;
+        }
+
+        Trial trial
+        {
+            on_event:entry()
+            {
+                item = test_items[test.cycle];
+
+                num_cycles = MAX_TEST_SUBTRIALS;
+
+                test_handler.setup();
+            }
+
+            on_event:exit()
+            {
+                test_handler.cleanup(event_time); // Do this BEFORE output gen.
+
+                // Add new row to output table.
+                SummaryTrialOutput trial_output = generate_summary(item, test_handler.lightpos);
+                trial_summary_output_append(trial_output);
+
+                // // Also save look/no-look durations.
+
+                int nstamps = control.clock.timestamps.size - 1;
+
+                int index;
+                while (index < nstamps)
+                {
+                    time lasttimestamp = control.clock.timestamps[index];
+                    SingleEpochOutput epoch_output;
+
+                    epoch_output.trial_type    = trial_output.trial_type;
+                    epoch_output.stimulus      = trial_output.stimulus;
+                    epoch_output.trial_num     = trial_output.trial_num;
+
+                    epoch_output.duration      = dur_to_seconds(control.clock.timestamps[index+1] - lasttimestamp); // seconds
+                    epoch_output.duration_ms   = int(control.clock.timestamps[index+1] - lasttimestamp);
+                    
+                    epoch_output.epoch_type    = (index & 1) ? "NOTLOOKING" : "LOOKING";
+
+                    epoch_output.snd_direction = trial_output.snd_direction;
+
+                    looknolook_output_append(epoch_output);
+
+                    index++;
+                }
+
+                save_trial_data();
+            }
+
+
+            SubTrial subtrial
+            {
+                // flag to easily check if last time we left because of timeout.
+                bool leave_because_lookaway;
+
+                on_event:entry()
+                {
+                    leave_because_lookaway = false;
+                    test_handler.action(this, item, reference_time);
+                }
+
+
+                on_event:message()
+                {
+                    if (message_arg == TIMEOUT)
+                    {
+                        trial.leave();
+                        leave_because_lookaway = true;
+                    }
+                    else
+                        leave();
+                }
+            }
+        }
+    }
+}
+
+
+void action(Part caller)
+{
+    // Activate the task. When the task is done, the registered caller
+    // (c.q. the main experiment object) will automatically be signalled.
+    task.enter(caller);
+}

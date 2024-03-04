@@ -1,0 +1,8 @@
+
+# output data related files
+./*.csv
+db/
+
+# vim temporary files
+*.sw[op]
+

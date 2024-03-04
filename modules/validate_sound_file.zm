@@ -1,0 +1,28 @@
+
+import std_sound_output_device;
+
+// Compares the samplerate of the SoundFile to the one setup for the device
+// A missmatch can be dangerous since it will likely change the tonation of
+// the WAV file.
+bool validate_sample_rate(SoundFile clip)
+{
+    if(clip.file_samplerate != sound_output_device.samplerate)
+    {
+        print_error(
+                "!! Warning - " +
+                "sound file and sound device set to different samplerates!\n"
+                );
+        print_error(
+                " - " + string(clip.file_samplerate)+ "Hz: " + clip.file
+                );
+        print_error(
+                string(sound_output_device.samplerate)  +
+                "Hz: sound device("                     +
+                sound_output_device.id                  +
+                ")"
+                );
+        flush_error();
+        return false;
+    }
+    return true;
+}

@@ -1,0 +1,77 @@
+/******************************************************************************\
+FILE:           std_sound_output_device.zm
+AUTHOR:         Theo Veenker <theo.veenker@beexy.nl>
+ADAPTED BY:     -
+
+DESCRIPTION:
+
+Provides a sound output device object. The device will be opened at
+initialization time.
+
+HISTORY:
+2017-01-01 TV   Initial version for Zep 2.0
+
+\******************************************************************************/
+
+
+plugin zep_sound;
+
+import sound_settings;
+
+enum SoundChannel {
+    FRONT_LEFT  = 0,
+    FRONT_RIGHT = 1,
+    REAR_LEFT   = 2,
+    REAR_RIGHT  = 3,
+}
+
+SoundPlaybackDevice sound_output_device
+{
+    init()
+    {
+        int device_id = PLAYBACK_DEVICE_ID;
+        string sound_device = "sounddev";
+        if (have_option(sound_device)) {
+            device_id = int(option_value(sound_device));
+        }
+        println("Using sound device = " + device_id);
+        open(
+            PLAYBACK_NUM_CHANNELS,
+            PLAYBACK_SAMPLE_RATE,
+            device_id,
+            PLAYBACK_LATENCY
+        );
+        if (error())
+        {
+            print_error("You can specify a specific sound device with --" + sound_device + "=<int>");
+            print_error("!! Error - failed to open sound device !!\n");
+            flush_error();
+            terminate;
+        }
+    }
+
+    // Compares the samplerate of the SoundFile to the one setup for the device
+    // A missmatch can be dangerous since it will likely change the tonation of
+    // the WAV file.
+    bool validate_sample_rate(SoundFile clip)
+    {
+        if(clip.file_samplerate != this.samplerate)
+        {
+            print_error(
+                "!! Warning - " +
+                "sound file and sound device set to different samplerates!\n"
+            );
+            print_error(
+                " - " + string(clip.file_samplerate)+ "Hz: " + clip.file
+            );
+            print_error(
+                string(sound_output_device.samplerate)
+                + "Hz: sound device("
+                + sound_output_device.id + ")"
+            );
+            flush_error();
+            return false;
+        }
+        return true;
+    }
+}

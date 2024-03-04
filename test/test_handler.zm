@@ -1,0 +1,361 @@
+/******************************************************************************\
+FILE:           test_handler.zm
+AUTHOR:         Theo Veenker <theo.veenker@beexy.nl>
+ADAPTED BY:     -
+
+DESCRIPTION:
+
+Provides a state machine to handle the head-turn procedure contingency for
+the lights only. Once started the auditory stimuli continue independently.
+It controls the lights through the experiment control page.
+
+
+HISTORY:
+2012-02-20 TV   Created.
+2017-05-26 TV   Adapted for Zep 2.0.
+2017-09-18 CvR  Adapted for UiL-OTS setup
+
+\******************************************************************************/
+
+import test::front_page;
+import test::left_page;
+import test::right_page;
+
+import validate_sound_file;
+
+// Symbolic definition of responses/events.
+enum TestEvent {
+    RESPONSE_GO,
+    RESPONSE_START_ATTENTION,
+    RESPONSE_HALT,
+    AUDIO_START,
+    AUDIO_FINISH
+}
+
+
+State test_handler
+{
+    TestItem    item;           // trial control parameters
+
+    Direction   lightpos;       // which side light is presented
+
+    int         samesidecount;
+
+    bool        running;        // set at first 'looking' for first trial
+
+
+    init()
+    {
+        lightpos = FRONT_SIDE;
+    }
+
+
+    on_event:exit()
+    {
+        lookaway.abort();
+
+        stop_light(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
+        control.hide_speaker_icon(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
+        control.erase_clock();
+    }
+
+
+    void start_light(int mask)
+    {
+        if (mask & FRONT_SIDE) test::front_page.show_animation();
+        if (mask & LEFT_SIDE) test::left_page.show_animation();
+        if (mask & RIGHT_SIDE) test::right_page.show_animation();
+        control.start_light(mask);
+    }
+
+
+    void stop_light(int mask)
+    {
+        if (mask & FRONT_SIDE) test::front_page.hide_animation();
+        if (mask & LEFT_SIDE) test::left_page.hide_animation();
+        if (mask & RIGHT_SIDE) test::right_page.hide_animation();
+        control.stop_light(mask);
+    }
+
+
+    State idle
+    {
+        on_event:entry()
+        {
+            stop_light(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
+        }
+
+
+        on_event:message()
+        {
+            if (message_arg == RESPONSE_START_ATTENTION)
+                attention_resetting.enter();
+        }
+    }
+
+
+    State attention_resetting
+    {
+        on_event:entry()
+        {
+            start_light(FRONT_SIDE);
+
+            // Only reset the clock at the first trial.
+            if (!running) control.begin_clock();
+        }
+
+
+        on_event:message()
+        {
+            if (message_arg == RESPONSE_GO)
+                stimulus_presentation.enter();
+        }
+    }
+
+
+    State stimulus_presentation
+    {
+        on_event:entry()
+        {
+            if( item.sound_direction == PSEUDO_RANDOM_SIDE )
+                set_pseudorandom_light_position();
+            else
+                lightpos = item.sound_direction;
+
+            stop_light(FRONT_SIDE);
+            start_light(lightpos);
+        }
+
+        // set the next lightposition pseudorandom (limit max repeats on one side)
+        void set_pseudorandom_light_position()
+        {
+
+            // Determine by chance the next side
+            Direction next_lightpos;
+            if (random(1000) >= 500)
+                next_lightpos = RIGHT_SIDE;
+            else
+                next_lightpos = LEFT_SIDE;
+
+            if(next_lightpos == lightpos)
+                samesidecount++;
+
+            if( samesidecount >= MAX_SAME_SIDE ) // force right side
+            {
+                next_lightpos = next_lightpos == LEFT_SIDE ? RIGHT_SIDE : LEFT_SIDE;
+                samesidecount = 0;
+            }
+
+            //set the new lightpos
+            lightpos =  next_lightpos;
+        }
+
+        on_event:message()
+        {
+            if (message_arg == RESPONSE_GO)
+            {
+                // Infant is looking; if this is the first trial then we
+                // become 'running' and the first auditory stimulus will be
+                // started.
+                if (!running)
+                {
+                    running = true;
+                    audio.play(event_time + 100ms);
+                }
+
+                looking.enter();
+            }
+        }
+    }
+
+
+    State looking
+    {
+        on_event:entry()
+        {
+            control.start_clock(event_time);
+        }
+
+
+        on_event:exit()
+        {
+            control.stop_clock(event_time);
+        }
+
+
+        on_event:message()
+        {
+            if (message_arg == RESPONSE_HALT)
+                not_looking.enter();
+            else if (message_arg == AUDIO_START)
+                control.release_clock(event_time);
+        }
+    }
+
+
+    State not_looking
+    {
+        on_event:entry()
+        {
+            if (control.clock.released)
+                lookaway.start(event_time + MAX_LOOKAWAY_DURATION);
+        }
+
+
+        on_event:exit()
+        {
+            lookaway.abort();
+        }
+
+
+        on_event:message()
+        {
+            if (message_arg == RESPONSE_GO)
+                looking.enter();
+            else if (message_arg == AUDIO_START)
+                control.release_clock(event_time);
+        }
+    }
+
+
+    Timer lookaway
+    {
+        on_event:expire()
+        {
+            done(TIMEOUT);
+        }
+    }
+
+
+    SoundPlayback audio
+    {
+        init()
+        {
+            num_channels = sound_settings::PLAYBACK_NUM_CHANNELS;
+        }
+
+
+        // Sound source/producer object.
+        SoundFile clip {}
+
+
+        on_event:start()
+        {
+            signal(test_handler, AUDIO_START);
+            control.show_speaker_icon(lightpos);
+        }
+
+
+        on_event:finish()
+        {
+            control.hide_speaker_icon(LEFT_SIDE | RIGHT_SIDE);
+            control.update_clock(event_time);
+            done(CONTINUE);
+        }
+
+        void setup_channels()
+        {
+            this.scaling_all = 0;
+
+            if(lightpos & FRONT_SIDE)
+            {
+                 this.scaling[FRONT_RIGHT] = sound_settings::PLAYBACK_SCALING_VOLUME;
+                 this.scaling[FRONT_LEFT] = sound_settings::PLAYBACK_SCALING_VOLUME;
+            }
+
+            if(lightpos & LEFT_SIDE)
+                this.scaling[REAR_LEFT] = sound_settings::PLAYBACK_SCALING_VOLUME;
+
+            if(lightpos & RIGHT_SIDE)
+                this.scaling[REAR_RIGHT] = sound_settings::PLAYBACK_SCALING_VOLUME;
+        }
+
+        void play(time tstart)
+        {
+            abort();
+
+            device = sound_output_device;
+
+            clip.file = stimuli_dir() + "sounds/" + item.sndfn;
+
+            validate_sample_rate(clip);
+
+            setup_channels();
+            start(tstart);
+        }
+    }
+
+    // Signals the initiator of the trial that we're done.
+    void done(int msgid)
+    {
+        signal_target(msgid);   // tell caller we're done
+        target = null;
+
+        control.clear_status();
+    }
+
+
+    //==========================================================================
+
+
+    // Performs preparatory work required before using this page.
+    void setup()
+    {
+        // Enable response box buttons and fallback keyboard keys.
+        control.target = this;
+        control.disable_buttons();
+        control.disable_keys();
+        control.enable_button(test::BUTTON_GO, RESPONSE_GO);
+        control.enable_button(test::BUTTON_HALT, RESPONSE_HALT);
+        control.enable_button(test::BUTTON_ATTENTION, RESPONSE_START_ATTENTION);
+        control.enable_key(KEY_Return, RESPONSE_GO);
+        control.enable_key(KEY_Escape, RESPONSE_HALT);
+
+        control.reset_clock();
+        enter();
+    }
+
+
+    // Performs cleaning up if necessary.
+    void cleanup(time t)
+    {
+        running = false;
+
+        control.end_clock(t);
+        audio.abort();
+
+        control.disable_buttons();
+        control.disable_keys();
+        control.target = null;
+
+        leave();
+    }
+
+
+    void action(Object caller, TestItem it, time tref)
+    {
+        // Save the passed trial control parameters.
+        item = it;
+
+        // The first subtrial (audio stimulus played) will be started at
+        // first looking at the target side light. Then we become 'running'.
+        // See state machine above. All subsequent subtrials are ITI apart.
+        if (running) audio.play(tref + INTERSTIMULUS_INTERVAL);
+
+        // Show pages representing the front and side lights on the appropriate
+        // test windows.
+        test_window1.show_page(test::front_page);
+        test_window2.show_page(test::left_page);
+        test_window3.show_page(test::right_page);
+
+
+        // Update status line on control window. Cleared in done() above.
+        control.set_status(
+            "id: " + string(item.id) + "  direction: " +
+            item.sound_direction);
+
+
+        // Remember who to signal when the trial is over.
+        target = caller;
+    }
+}
