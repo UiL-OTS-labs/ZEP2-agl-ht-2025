@@ -17,40 +17,14 @@ Participant record preparation:
 int create_participant_fields()
 {
     expdb.participant.add_field("gender");
-    expdb.participant.add_field("birthdate");
-    expdb.participant.add_field("order");
-    expdb.participant.add_field("stimlang");
 
     return OK;
-}
-
-string[] supported_languages = {
-    "Dutch",
-    "Norwegian",
-};
-
-bool in_supported_languages(string language) {
-    int i = 0;
-    while(i < supported_languages.size) {
-        if (language == supported_languages[i])
-            return true;
-        i++;
-    }
-    return false;
 }
 
 // Checks value of required participant record fields, if applicable.
 int check_participant_fields()
 {
     if (expdb.participant.get_enum_field("gender") == "") return ERROR;
-    if (expdb.participant.get_date_field("birthdate") < 1900-01-01) return ERROR;
-    if (expdb.participant.get_date_field("birthdate") >= now()) return ERROR;
-    if (
-        expdb.participant.get_int_field("order") < 1 ||
-        expdb.participant.get_int_field("order") > 4
-        ) return ERROR;
-    if (!in_supported_languages(expdb.participant.get_enum_field("stimlang")))
-        return ERROR;
 
     return OK;
 }
