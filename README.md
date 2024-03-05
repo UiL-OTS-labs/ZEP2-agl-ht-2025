@@ -1,12 +1,8 @@
-# Head-turn Preference Procedure (Manyababies 1 implementation)
-You can find the source code for this experiment at
-[GitHub](https://github.com/UiL-OTS-labs/ZEP2-headturn-preference-BOILERPLATE/tree/implementation/manybabies1).
-*   Originally authored by: [Theo Veenker](theo.veenker@beexy.nl)
-*   Adapted by (heavily): [Chris van Run](C.P.A.vanrun@uu.nl)
-*   For clients:
-    *   [Maartje de Klerk](https://www.uu.nl/medewerkers/MdeKlerk/0)
-    *   [Caroline Junge](https://www.uu.nl/staff/CMMJunge/0)
+# Head-turn Preference artificial grammar learning
 
+## This script is based on manybabies 
+In order to get a head turn preference experiment up and running this script is
+base on the code of [manybabies](https://github.com/UiL-OTS-labs/manybabies)
 
 ## Description:
 Purpose of this ZEP-based experiment is to see whether an infant participant can
@@ -28,18 +24,9 @@ presented.
 The researcher indicates a look start by pressing the `RETURN` key and a look
 end by pressing the `ESCAPE`. This can alternatively be done via the BeexyBox B.
 
-## Implementation details
-This version of the HPP experiment has been adapted to suit the requirements of
-the [manyababies 1 experiment](http://manybabies.stanford.edu/).
-
-
 ## Output
 In this implementation the front and side lights will be presented via three
 computer monitors. Therefore this implementation requires a quad head videocard.
-
-The familiarization-items presentation order is random. The test-items order is
-pseudorandomized such that there are never more than two of novel-type items
-(NOVEL) or familiar-type items (FAMIL) that appear in sequence.
 
 Generate output in comma-separated files by running `zepdb2extract`. See the usage
 description on how to use zepdb2exact (`zepdb2extract -h`).
@@ -60,22 +47,9 @@ instructions that help you understand and modify a Zep experiment.
 *Config Looking Times*. For maximum looking-time settings see `test/defs.zm` and
 `familiarization/defs.zm`.
 
-*Add stimuli*. Add the WAV sound files to `stimuli/sounds` directory and edit the
-stimuli lists at `stimuli/EXAMPLE.csv`
+*Add stimuli*.
 
-*Edit stimuli lists*. Every line represents one experiment trial. Each variable
-separates by a semicolon (`;`).
-*   `id` is a unique reference for human convenience. `
-*   `trial_type` adult-directed speech (ADS), infant-directed speech (IDS) or training.
-*   `sndfn` is the soundfile that plays (e.g. 'test.wav').
-*   `sound_direction` dictates which direction the sound should come from and
-    should be one of the following values:
-    *   `FRONT_SIDE`/`LEFT_SIDE`/`RIGHT_SIDE`: self explanatory
-    *   `LEFT_AND_RIGHT_SIDE`: plays both in the left and right channel
-        simultaneously.
-    *   `PSEUDO_RANDOM_SIDE`: pseudo-random side with the restriction that one
-        side not allowed more than twice in a row. Note that this does not count
-        manually set sides.
+*Edit stimuli lists*.
 
 *Fine tune your hardware setup*. As mentioned above a quad-head setup is
 required (four monitors). Window- and head -linking settings is read from
@@ -97,22 +71,18 @@ the video-capture signal should be duplicates. The recording computer can then
 apply a chroma-key to the display signal, overlay it on a video feed and save
 the result for [off-line
 analysis](https://github.com/UiL-OTS-labs-backoffice/UiL-OTS-Video-Coding-System).
-To get the multi-head setup to function under Kubuntu (Linux/GNU OS) we had to
-use the Nvidia's
-[baseMosaic](http://nvidia.custhelp.com/app/answers/detail/a_id/3580/~/how-to-configure-mosaic-on-linux)
-feature.
+To get the multi-head setup to function under ubuntu (Linux/GNU OS) we had to
+use the an AMD videocard.
 
 The critical hardware/software used in the UiL-OTS lab is as follows:
-*   3 x Nvidia NVS 310 GPUs (though we recommend using a single NVS 810 instead)
-*   Asus Xonar Dx (sound card)
-*   BlackMagic Decklink (video-capture card)
-*   Logitech Webcam C920
+*   1 x AMD Video card using 5 outputs 3 for the infant, 1 for the experimenter
+    1 that is an overlay of the experimentor monitor.
+*   Asus Xonar Dx (sound card) You'll need to be able to address 3 speakers at 
+    an individual channel.
 *   BeexyBox B (response box; alternatively one can use the keyboard)
 *   Open Broadcaster Studio (software)
-*   Zep 2.0.9
-
-![Hardware Setup](.hardware_setup.jpg)
-
+*   Zep 2.6.
+*   BlackMagic (video-capture card) (Recording pc)
 
 ## References
 *   Kemler-Nelson, D. G., Jusczyk, P. W., Mandel, D. R., Myers, J., Turk, A. &
