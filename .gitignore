@@ -6,3 +6,5 @@ db/
 # vim temporary files
 *.sw[op]
 
+# python virtual env
+venv 
