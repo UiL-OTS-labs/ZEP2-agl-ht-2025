@@ -34,7 +34,7 @@ import std_sound_output_device;
 
 // Custom modules
 import baby_windows3;
-import stimuli;
+import familiarization::stimuli;
 import familiarization::task;
 import test::task;
 

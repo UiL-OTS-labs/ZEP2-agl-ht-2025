@@ -1,0 +1,27 @@
+
+/* This is a module with records shared withing all modules in all
+   namespaces. */
+
+// Symbolic definition of item type.
+enum LanguageType
+{
+    L1, // Stimulus from language 1
+    L2, // from language 2.
+}
+
+enum ProsodyType
+{
+    NOPROSODY, 
+    FUNCTIONAL, 
+    EMPHASIZED,
+}
+
+
+// Item table record.
+record TestItem
+{
+    int                             id;                 // item trial_num
+    LanguageType                    language;           // item type
+    string                          sndfn;              // stimulus sound file
+    std_baby_control::Direction     sound_direction;    // direction the sounds come from
+}

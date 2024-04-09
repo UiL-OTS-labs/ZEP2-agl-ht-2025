@@ -1,0 +1,105 @@
+/******************************************************************************\
+FILE:           stimuli.zm
+AUTHOR:         Theo Veenker <theo.veenker@beexy.nl>
+ADAPTED BY:     -
+
+DESCRIPTION:
+
+Defines the formats of item table(s) and provides the actual content of
+the item table(s) i.e. stimulus information.
+
+
+HISTORY:
+2012-02-20 TV   Created.
+2017-05-26 TV   Adapted for Zep 2.0.
+2017-09-18 CvR  Adapted for UiL-OTS setup
+
+\******************************************************************************/
+
+plugin zep_file;
+
+import agl_records;
+
+// L1
+// baa X geu and noe X suu
+const string L1_SYLLABLE_1A = "baa";
+const string L1_SYLLABLE_1B = "noe";
+const string L1_SYLLABLE_3A = "geu";
+const string L1_SYLLABLE_3B = "suu";
+
+// L2
+// baa X suu and noe X geu
+const string L2_SYLLABLE_1A = "baa";
+const string L2_SYLLABLE_1B = "noe";
+const string L2_SYLLABLE_3A = "suu";
+const string L2_SYLLABLE_3B = "geu";
+
+string[] middle_items = {
+    "boo",
+    "buu",
+    "daa",
+    "deu",
+    "duu",
+    "gie",
+    "goo",
+    "guu",
+    "meu",
+    "peu",
+    "puu",
+    "rie",
+    "saa",
+    "seu",
+    "soe",
+    "taa",
+    "teu",
+    "too",
+};
+
+TestItem[] fam_stimuli = {};
+
+// Loads item table(s) from CSV file(s) in the stimuli folder.
+int compute_fam_stimuli (TestItem[] target)
+{
+    return OK;
+}
+
+int check_stimuli_list(TestItem[] stimuli_list)
+{
+    // List is not supposed to be empty
+    if(stimuli_list.size == 0)
+    {
+        ctrl_window.show_error("A stimulus list is empty");
+        return ERROR;
+    }
+
+
+    int index = 0;
+    while( index < stimuli_list.size )
+    {
+        string full_filename = stimuli_dir() + "sounds/" + stimuli_list[index].sndfn;
+        if( !file_readable(full_filename) )
+        {
+            ctrl_window.show_error("Soundfile '" + stimuli_list[index].sndfn + "' is not readable. Does it exist?");
+            return ERROR;
+        }
+
+        if( !file_readable(full_filename) )
+        {
+            ctrl_window.show_error("Soundfile '" + stimuli_list[index].sndfn + "' is not readable. Does it exist?");
+            return ERROR;
+        }
+
+        index = index + 1;
+    }
+
+    return OK;
+}
+
+int load_stimuli() {
+    int status = compute_fam_stimuli(fam_stimuli);
+    if (status != OK)
+        return status;
+
+    return check_stimuli_list(fam_stimuli);
+}
+
