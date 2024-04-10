@@ -41,6 +41,8 @@ string[] valid_language = {
     "l2",
 };
 
+
+// Create a list of values in a string format
 string valid_values(string[] values) {
     int i = 0;
     string valid = "[";

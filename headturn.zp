@@ -48,8 +48,17 @@ Experiment experiment
 {
     on_event:entry()
     {
-        stimuli::bootstrap_stimulus_lists();
-
+        int status = familiarization::load_stimuli();
+        if (status != OK) {
+            print_error("Unable to load familiarization stimuli\n");
+            flush_error();
+        }
+        status = test::load_stimuli();
+        if (status != OK) {
+            print_error("Unable to load test stimuli\n");
+            flush_error();
+        }
+ 
         if(control.state == CONTROL_RUNNING && !error()) show_test_windows();
     }
 

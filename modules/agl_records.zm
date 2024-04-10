@@ -25,3 +25,21 @@ record TestItem
     string                          sndfn;              // stimulus sound file
     std_baby_control::Direction     sound_direction;    // direction the sounds come from
 }
+
+void print_test_item(TestItem item) {
+    println( "" + item.id + "\t"
+                + item.language + "\t"
+                + item.sndfn + "\t"
+                + item.sound_direction
+    );
+
+}
+
+void
+print_test_items(TestItem[] items) {
+    int i = 0;
+    while (i < items.size) {
+        print_test_item(items[i]);
+        i++;
+    }
+}

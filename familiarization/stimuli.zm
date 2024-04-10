@@ -55,11 +55,59 @@ string[] middle_items = {
     "too",
 };
 
-TestItem[] fam_stimuli = {};
-
-// Loads item table(s) from CSV file(s) in the stimuli folder.
-int compute_fam_stimuli (TestItem[] target)
+void append_test_item(TestItem[] items, TestItem item)
 {
+    items.size = items.size + 1;
+    items[items.size - 1] = item;
+}
+
+void
+append_fam_items(TestItem[] items, string prefix, string postfix, LanguageType lt, string prosody) {
+    
+    int i = 0;
+    while (i < middle_items.size) {
+        TestItem item;
+        item.id = items.size + 1;
+        item.sndfn = prefix + "_" + middle_items[i] + "_" + postfix + "_" + prosody;
+        item.language = lt;
+        item.sound_direction = FRONT_SIDE;
+
+        append_test_item(items, item);
+
+        i++;
+    }
+}
+
+// Computes the name of the stimuli.
+int compute_fam_stimuli ()
+{
+    LanguageType lt;
+    string slt = expdb.participant.get_enum_field("language");
+    lt = slt == "l1" ? L1 : L2;
+    
+    ProsodyType prosody;
+    string sprosopdy = expdb.participant.get_enum_field("prosody");
+
+    if (lt == L1) {
+        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, L1, sprosopdy);
+        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, L1, sprosopdy);
+        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, L1, sprosopdy);
+        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, L1, sprosopdy);
+    }
+    else {
+        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, L2, sprosopdy);
+        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, L2, sprosopdy);
+        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, L2, sprosopdy);
+        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, L2, sprosopdy);
+    }
+
+    fam_items.shuffle(0, fam_items.size/2); // shuffle first half
+    fam_items.shuffle(fam_items.size/2, -1); // shuffle second half
+
+    if (have_flag("print-items") || have_flag("print-fam-items")) {
+        print_test_items(fam_items);
+    }
+    
     return OK;
 }
 
@@ -76,30 +124,25 @@ int check_stimuli_list(TestItem[] stimuli_list)
     int index = 0;
     while( index < stimuli_list.size )
     {
-        string full_filename = stimuli_dir() + "sounds/" + stimuli_list[index].sndfn;
+        string full_filename = stimuli_dir() + "sounds/fam/" + stimuli_list[index].sndfn + ".wav";
         if( !file_readable(full_filename) )
         {
+            print_error("\"" + full_filename +"\" isn't found");
             ctrl_window.show_error("Soundfile '" + stimuli_list[index].sndfn + "' is not readable. Does it exist?");
             return ERROR;
         }
 
-        if( !file_readable(full_filename) )
-        {
-            ctrl_window.show_error("Soundfile '" + stimuli_list[index].sndfn + "' is not readable. Does it exist?");
-            return ERROR;
-        }
-
-        index = index + 1;
+        index++;
     }
 
     return OK;
 }
 
 int load_stimuli() {
-    int status = compute_fam_stimuli(fam_stimuli);
+    int status = compute_fam_stimuli();
     if (status != OK)
         return status;
 
-    return check_stimuli_list(fam_stimuli);
+    return check_stimuli_list(fam_items);
 }
 

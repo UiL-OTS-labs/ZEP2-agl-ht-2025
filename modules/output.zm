@@ -21,9 +21,11 @@ HISTORY:
 // to the table column definitions using ZepMan.
 record SummaryTrialOutput
 {
-    string      trial_type; // trial number
+    int         id; // the nth stimulus
+
+    LanguageType language_type;
+
     string      stimulus;
-    int         trial_num;
 
     real        looking_time; // looking time [s]
     real        not_looking_time; // not looking time [s]
@@ -35,7 +37,7 @@ record SummaryTrialOutput
 
     int         lookaways; // number of times looked away
 
-    string   snd_direction; // stimulus direction
+    string      snd_direction; // stimulus direction
 }
 
 real dur_to_seconds(dur d)
@@ -47,10 +49,10 @@ real dur_to_seconds(dur d)
 SummaryTrialOutput generate_summary(TestItem item, Direction sound_direction)
 {
     SummaryTrialOutput trial_output;
-    trial_output.trial_type       = string(item.trial_type);
+    trial_output.language_type    = item.language;
     trial_output.stimulus         = substring(item.sndfn, 0, item.sndfn.length-4);
 
-    trial_output.trial_num        = item.id;
+    trial_output.id               = item.id;
 
     trial_output.looking_time     = dur_to_seconds(control.clock.duration);
     trial_output.looking_time_ms  = int(control.clock.duration);
@@ -79,43 +81,43 @@ void trial_summary_output_append(SummaryTrialOutput data)
     // Set column values of the trial data record. The descriptions (final
     // arguments) are optional but recommended.
 
-    expdb.set_trial_data_string_field("trial_type", data.trial_type,
-    "`IDS`, `ADS`, and `training`");
+    expdb.set_trial_data_enum_field("language_type", string(data.language_type),
+    "`L1`, `L2`");
 
     expdb.set_trial_data_string_field("stimulus", data.stimulus,
-    "`training`, `IDSx` or `ADSx` - the actual sound file that was playing");
+    "`training`, the actual sound file that was playing");
 
-    expdb.set_trial_data_int_field("trial_num", data.trial_num,
-        "trial number, from 1 -- 16 (with -2 and -1 denoting training trials)");
+    expdb.set_trial_data_int_field("id", data.id,
+        "trial number");
 
     expdb.set_trial_data_real_field("looking_time", data.looking_time,
         "looking time in seconds, to at least 2 decimal places."
         "If a trial was not conducted because the experiment ended early,"
         " enter NC (data not collected)");
 
-        expdb.set_trial_data_real_field("looking_time_ms", data.looking_time_ms,
-            "looking time in milliseconds."
-            "If a trial was not conducted because the experiment ended early,"
-            " enter NC (data not collected)");
+    expdb.set_trial_data_real_field("looking_time_ms", data.looking_time_ms,
+        "looking time in milliseconds."
+        "If a trial was not conducted because the experiment ended early,"
+        " enter NC (data not collected)");
 
     expdb.set_trial_data_real_field("not_looking_time", data.not_looking_time,
         "not looking time in seconds, to at least 2 decimal places.");
 
     expdb.set_trial_data_real_field("not_looking_time_ms", data.not_looking_time_ms,
-            "not looking time in milliseconds.");
+        "not looking time in milliseconds.");
 
     expdb.set_trial_data_real_field("total_trial_time", data.total_trial_time,
-    "total length of the trial from initiation of the sound stimulus to the end"
-    "of the 2 second look-away time or trial end. For non-contingent protocols,"
-    " this will be 18 s for every trial (unless the trial was not "
-    "presented/experiment terminated early");
+        "total length of the trial from initiation of the sound stimulus to the end"
+        "of the 2 second look-away time or trial end. For non-contingent protocols,"
+        " this will be 18 s for every trial (unless the trial was not "
+        "presented/experiment terminated early");
 
     expdb.set_trial_data_real_field("total_trial_time_ms", data.total_trial_time_ms,
-    "total length of the trial from initiation of the sound stimulus to the end"
-    "in milliseconds"
-    "of the 2 second look-away time or trial end. For non-contingent protocols,"
-    " this will be 18 s for every trial (unless the trial was not "
-    "presented/experiment terminated early");
+        "total length of the trial from initiation of the sound stimulus to the end"
+        "in milliseconds"
+        "of the 2 second look-away time or trial end. For non-contingent protocols,"
+        " this will be 18 s for every trial (unless the trial was not "
+        "presented/experiment terminated early");
 
     expdb.set_trial_data_int_field("looksaways", data.lookaways,
         "Number of not look epochs");
