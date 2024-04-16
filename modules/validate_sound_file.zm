@@ -19,7 +19,7 @@ bool validate_sample_rate(SoundFile clip)
                 string(sound_output_device.samplerate)  +
                 "Hz: sound device("                     +
                 sound_output_device.id                  +
-                ")"
+                ")\n"
                 );
         flush_error();
         return false;

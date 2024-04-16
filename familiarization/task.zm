@@ -35,22 +35,18 @@ Block task
 {
     Block familiarization
     {
-        TestItem    item;           // current item
 
         on_event:entry()
         {
-            num_cycles = fam_items.size;
+            num_cycles = 1;
         }
 
         Trial trial
         {
             on_event:entry()
             {
-                item = fam_items[familiarization.cycle];
-
                 fam_handler.setup();
-
-                fam_handler.action(this, item, reference_time);
+                fam_handler.action(this, reference_time);
             }
 
             on_event:exit()
@@ -58,10 +54,8 @@ Block task
                 fam_handler.cleanup(event_time);
 
                 // Add new row to output table.
-                SummaryTrialOutput trial_output = generate_summary(item, fam_handler.lightpos);
-                trial_summary_output_append(trial_output);
 
-                // // Also save look/no-look durations.
+                // Also save look/no-look durations.
 
                 int nstamps = control.clock.timestamps.size - 1;
 
@@ -71,14 +65,10 @@ Block task
                     time lasttimestamp = control.clock.timestamps[index];
                     SingleEpochOutput epoch_output;
 
-                    epoch_output.stimulus      = trial_output.stimulus;
-
                     epoch_output.duration      = dur_to_seconds(control.clock.timestamps[index+1] - lasttimestamp); // seconds
                     epoch_output.duration_ms   = int(control.clock.timestamps[index+1] - lasttimestamp);
-
                     epoch_output.epoch_type    = (index & 1) ? "NOTLOOKING" : "LOOKING";
-
-                    epoch_output.snd_direction = trial_output.snd_direction;
+                    epoch_output.snd_direction = "front";
 
                     looknolook_output_append(epoch_output);
 

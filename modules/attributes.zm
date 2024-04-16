@@ -113,7 +113,7 @@ FieldDefInit[] participant_attribute_defs =
         FIELD_TYPE_ENUM,
 
         // Attribute description.
-        "The desired language (L1 or L2) of the stimuli",
+        "The desired language (l1 or l2) of the stimuli",
 
         // Set if attribute may identify a person.
         false,
@@ -131,7 +131,7 @@ FieldDefInit[] participant_attribute_defs =
         true,
 
         // Enumerator list.
-        "L1|L2"
+        "l1|l2"
     },
 }
 
