@@ -28,11 +28,33 @@ import fam_handler;
 import std_blank_page;
 import repeat_query_page;
 
+import eyetracker_infant;
+import et_setup_page;
+
 // Familiarization item table.
 TestItem[..] fam_items;
 
 Block task
 {
+
+    on_event:entry()
+    {
+        eyetracker.setup();
+    }
+    
+    on_event:exit()
+    {
+        eyetracker.cleanup();
+    }
+
+    Part calibration
+    {
+        on_event:entry()
+        {
+            et_setup_page.action(this);
+        }
+    }
+
     Block familiarization
     {
 

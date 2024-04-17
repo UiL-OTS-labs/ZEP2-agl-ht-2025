@@ -126,6 +126,10 @@ Experiment experiment
 
         on_event:exit()
         {
+            // Retrieve native eyetracking files when applicable
+            eyetracker_device.retrieve_data_files();
+
+            // Abort audio
             sound_output_device.close();
             sound_playback.looper.abort();
             sound_playback.abort();
@@ -136,7 +140,6 @@ Experiment experiment
     {
         init()
         {}
-
 
         // Sound source/producer object.
         SoundFile clip {}
@@ -152,6 +155,7 @@ Experiment experiment
         }
 
         Timer looper {
+
             on_event:expire()
             {
                 sound_playback.play("music.wav", event_time);
