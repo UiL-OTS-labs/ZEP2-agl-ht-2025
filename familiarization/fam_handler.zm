@@ -17,6 +17,7 @@ HISTORY:
 \******************************************************************************/
 
 import familiarization::front_page;
+import output;
 import test::left_page;
 import test::right_page;
 import validate_sound_file;
@@ -199,14 +200,23 @@ State fam_handler
 
         on_event:finish()
         {
+            FamStimOutput out;
             control.hide_speaker_icon(lightpos);
             control.update_clock(event_time);
+
+            out.trial = nth_stimulus + 1;
+            out.id = item.id;
+            out.language = item.language;
+            out.sound_direction = string(item.sound_direction);
+
             nth_stimulus++;
 
             if (nth_stimulus >= fam_items.size) // we're done
                 done(CONTINUE);
             else
                 play(event_time + INTERSTIMULUS_INTERVAL);
+
+            fam_stim_output_append(out);
         }
 
         void setup_channels()
@@ -239,6 +249,10 @@ State fam_handler
             clip.fade_in_duration = 0s; //reset
 
             validate_sample_rate(clip);
+
+            control.set_status(
+                "trial: " + (nth_stimulus + 1) + "  id: " + string(item.id) +
+                "  direction: " + item.sound_direction);
 
             setup_channels();
             start(tstart);
@@ -304,9 +318,6 @@ State fam_handler
 
 
         // Update status line on control window. Cleared in done() above.
-        control.set_status(
-            "id: " + string(item.id) + "  direction: " +
-            item.sound_direction);
 
 
         // Remember who to signal when the trial is over.

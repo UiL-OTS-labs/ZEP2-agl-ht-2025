@@ -1,0 +1,48 @@
+
+// A record that stores information about a stimulus presented in the
+// familiarization phase.
+record FamStimOutput
+{
+    int         trial;  // The nth fam stimulus
+    int         id;     // the id of the stimulus
+
+    LanguageType language;
+    string      stimulus;
+    string      sound_direction; // stimulus direction
+
+    int         ms_start; // Start of stimulus with respect to the start the script
+    int         ms_stop;  // Stop of stimulus with respect to the start the script
+}
+
+
+// Appends one row of data to test output table.
+void fam_stim_output_append(FamStimOutput data)
+{
+    println("Adding fam output");
+    // Create new trial data record. The title (final argument) is optional
+    // but recommended.
+    expdb.add_trial_data_record(namespace_name, "1",
+        "Familiarization stimulus data");
+
+    expdb.set_trial_data_int_field("trial", data.trial,
+        "identifies stimulus");
+    expdb.set_trial_data_int_field("id", data.id,
+        "identifies stimulus");
+
+    expdb.set_trial_data_string_field("stimulus", data.stimulus,
+        "the name of the sound file that was playing");
+
+    expdb.set_trial_data_string_field("sound_direction", data.sound_direction,
+        "Direction the sound was played from.");
+
+    expdb.set_trial_data_int_field("stim_start", data.ms_start,
+        "The start of the stimulus with respect to the start of the script in ms"
+    );
+    expdb.set_trial_data_int_field("stim_stop", data.ms_stop,
+        "The stop of the stimulus with respect to the start of the script in ms"
+    );
+
+    expdb.set_trial_data_string_field("sound_direction", data.sound_direction,
+        "Direction the sound was played from.");
+}
+

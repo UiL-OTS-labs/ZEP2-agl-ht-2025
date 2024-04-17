@@ -65,10 +65,10 @@ Block task
                     time lasttimestamp = control.clock.timestamps[index];
                     SingleEpochOutput epoch_output;
 
-                    epoch_output.duration      = dur_to_seconds(control.clock.timestamps[index+1] - lasttimestamp); // seconds
-                    epoch_output.duration_ms   = int(control.clock.timestamps[index+1] - lasttimestamp);
-                    epoch_output.epoch_type    = (index & 1) ? "NOTLOOKING" : "LOOKING";
-                    epoch_output.snd_direction = "front";
+                    epoch_output.duration       = dur_to_seconds(control.clock.timestamps[index+1] - lasttimestamp); // seconds
+                    epoch_output.duration_ms    = int(control.clock.timestamps[index+1] - lasttimestamp);
+                    epoch_output.epoch_type     = (index & 1) ? "NOTLOOKING" : "LOOKING";
+                    epoch_output.snd_direction  = "front";
 
                     looknolook_output_append(epoch_output);
 

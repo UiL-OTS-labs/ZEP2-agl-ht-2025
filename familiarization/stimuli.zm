@@ -89,16 +89,20 @@ int compute_fam_stimuli ()
     string sprosopdy = expdb.participant.get_enum_field("prosody");
 
     if (lt == L1) {
-        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, L1, sprosopdy);
-        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, L1, sprosopdy);
-        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, L1, sprosopdy);
-        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, L1, sprosopdy);
+        // first 36
+        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
+        // second 36
+        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
     }
-    else {
-        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, L2, sprosopdy);
-        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, L2, sprosopdy);
-        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, L2, sprosopdy);
-        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, L2, sprosopdy);
+    else { // 2nd and 3rd argument are different
+        // first 36
+        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
+        // second 36
+        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
     }
 
     fam_items.shuffle(0, fam_items.size/2); // shuffle first half
