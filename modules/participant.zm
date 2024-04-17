@@ -17,14 +17,95 @@ Participant record preparation:
 int create_participant_fields()
 {
     expdb.participant.add_field("gender");
+    expdb.participant.add_field("birthdate");
+    expdb.participant.add_field("prosody");
+    expdb.participant.add_field("language");
 
     return OK;
+}
+
+string[] valid_gender = {
+    "male",
+    "female",
+    "other"
+};
+
+string[] valid_prosody = {
+    "noprosody",
+    "functional",
+    "emphasized"
+};
+
+string[] valid_language = {
+    "l1",
+    "l2",
+};
+
+
+// Create a list of values in a string format
+string valid_values(string[] values) {
+    int i = 0;
+    string valid = "[";
+    while (i < values.size) {
+        if (i < values.size - 1) {
+            valid += values[i] + ", ";
+        }
+        else {
+            valid += values[i];
+        }
+        i++;
+    }
+    valid += "]";
+    return valid;
+}
+
+int check_enum_field_in_array(string[] array, string field, string variable) {
+    int i = 0;
+    while (i < array.size) {
+        if (field == array[i])
+            return OK;
+        i++;
+    }
+
+    
+    string error = "The value " + field + " is invalid for \"" + variable;
+    error += "\"\n\tValid values: " + valid_values(array) + "\n";
+
+    print_error(error);
+    flush_error();
+
+    return ERROR;
 }
 
 // Checks value of required participant record fields, if applicable.
 int check_participant_fields()
 {
-    if (expdb.participant.get_enum_field("gender") == "") return ERROR;
+    int status = OK;
 
-    return OK;
+    string gender = expdb.participant.get_enum_field("gender");
+    status = check_enum_field_in_array(
+        valid_gender,
+        gender,
+        "gender"
+    );
+    if (status != OK)
+        return status;
+
+    string prosody = expdb.participant.get_enum_field("prosody");
+    status = check_enum_field_in_array(
+        valid_prosody,
+        prosody,
+        "prosody"
+    );
+    if (status != OK)
+        return status;
+
+
+    string language = expdb.participant.get_enum_field("language");
+    status = check_enum_field_in_array(
+        valid_language,
+        language,
+        "language"
+    );
+    return status;
 }

@@ -22,34 +22,34 @@ The similar applies for researcher, experiment and group.
 FieldDefInit[] participant_attribute_defs =
 {
     {
-      // Attribute id.
-      "gender",
+        // Attribute id.
+        "gender",
 
-      // Attribute type.
-      FIELD_TYPE_ENUM,
+        // Attribute type.
+        FIELD_TYPE_ENUM,
 
-      // Attribute description.
-      "Biological or physiological sex",
+        // Attribute description.
+        "Biological or physiological sex",
 
-      // Set if attribute may identify a person.
-      false,
+        // Set if attribute may identify a person.
+        false,
 
-      // Set if attribute may contain sentitive information.
-      false,
+        // Set if attribute may contain sentitive information.
+        false,
 
-      // Set to exclude attribute from export.
-      false,
+        // Set to exclude attribute from export.
+        false,
 
-      // Set to show attribute in zepman record list.
-      false,
+        // Set to show attribute in zepman record list.
+        false,
 
-      // Set if attribute is required for experiment.
-      true,
+        // Set if attribute is required for experiment.
+        true,
 
-      // Enumerator list.
-      "male|female|other"
-  },
-  {
+        // Enumerator list.
+        "male|female|other"
+    },
+    {
         // Attribute id.
         "birthdate",
 
@@ -79,13 +79,13 @@ FieldDefInit[] participant_attribute_defs =
     },
     {
         // Attribute id.
-        "order",
+        "prosody",
 
         // Attribute type.
-        FIELD_TYPE_INT,
+        FIELD_TYPE_ENUM,
 
         // Attribute description.
-        "Which stimulus order to use (1-4).",
+        "Which kind of prosody: noprosody, functional or emphasized",
 
         // Set if attribute may identify a person.
         false,
@@ -103,17 +103,17 @@ FieldDefInit[] participant_attribute_defs =
         true,
 
         // Not used.
-        ""
+        "noprosody|functional|emphasized"
     },
     {
         // Attribute id.
-        "stimlang", // short for stimulus language
+        "language", // short for stimulus language
 
         // Attribute type.
         FIELD_TYPE_ENUM,
 
         // Attribute description.
-        "The desired language (Dutch, Norwegian) of the stimuli",
+        "The desired language (l1 or l2) of the stimuli",
 
         // Set if attribute may identify a person.
         false,
@@ -131,7 +131,7 @@ FieldDefInit[] participant_attribute_defs =
         true,
 
         // Enumerator list.
-        "Dutch|Norwegian"
+        "l1|l2"
     },
 }
 

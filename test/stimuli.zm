@@ -1,0 +1,6 @@
+
+int load_stimuli() {
+    println("Create test stimuli instead of printing this message");
+    return OK;
+}
+

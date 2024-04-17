@@ -1,0 +1,105 @@
+/******************************************************************************\
+FILE:           front_page.zm
+AUTHOR:         Theo Veenker <theo.veenker@beexy.nl>
+ADAPTED BY:     -
+
+DESCRIPTION:
+
+Provides a page object for presenting the front screen attention getter.
+The attention getter is a size modulated green circle.
+
+HISTORY:
+2017-01-09 TV   Created.
+
+\******************************************************************************/
+
+
+Page front_page
+{
+    init()
+    {
+        fill_pattern_color = TEST_PAGE_COLOR;
+    }
+
+
+    VerticalLayout layout
+    {
+        init()
+        {
+            spacing = 50;
+            height = 0;     // 0 means as large as possible
+        }
+
+
+        CanvasGadget canvas
+        {
+
+            init()
+            {
+//                fill_pattern_color = TEST_PAGE_STIMULUS_COLOR;
+                size = 800, 800;
+                offset_x = 0;
+                offset_y = 0;
+            }
+
+
+            ImageShape attention
+            {
+                int image_num = 0;
+                const int NUM_GRIDS = 25;
+                string prefix;
+                string postfix;
+
+                string image_fn() {
+                    return prefix + "grid" + image_num + postfix;
+                }
+
+                init()
+                {
+                    prefix = stimuli_dir() + "images/";
+                    postfix = ".png";
+                    image = image_fn();
+                    width = canvas.width;
+                    height= canvas.width;
+                }
+
+                pre_update()
+                {
+                    if (relative_frame % 60 == 0) {
+                        image_num = (image_num + 1) % NUM_GRIDS;
+                        image = image_fn();
+                    }
+                }
+            }
+        }
+
+
+        void start_attention_getter()
+        {
+            println(relative_frame);
+            canvas.attention.start(now(), 180s);
+        }
+
+
+        void stop_attention_getter()
+        {
+            canvas.attention.abort();
+            canvas.attention.is_visible = false;
+        }
+    }
+
+
+    //==========================================================================
+
+
+    void show_animation()
+    {
+        layout.start_attention_getter();
+    }
+
+
+    void hide_animation()
+    {
+        layout.stop_attention_getter();
+    }
+}

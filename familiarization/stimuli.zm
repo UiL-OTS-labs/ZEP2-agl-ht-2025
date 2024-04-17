@@ -1,0 +1,152 @@
+/******************************************************************************\
+FILE:           stimuli.zm
+AUTHOR:         Theo Veenker <theo.veenker@beexy.nl>
+ADAPTED BY:     -
+
+DESCRIPTION:
+
+Defines the formats of item table(s) and provides the actual content of
+the item table(s) i.e. stimulus information.
+
+
+HISTORY:
+2012-02-20 TV   Created.
+2017-05-26 TV   Adapted for Zep 2.0.
+2017-09-18 CvR  Adapted for UiL-OTS setup
+
+\******************************************************************************/
+
+plugin zep_file;
+
+import agl_records;
+
+// L1
+// baa X geu and noe X suu
+const string L1_SYLLABLE_1A = "baa";
+const string L1_SYLLABLE_1B = "noe";
+const string L1_SYLLABLE_3A = "geu";
+const string L1_SYLLABLE_3B = "suu";
+
+// L2
+// baa X suu and noe X geu
+const string L2_SYLLABLE_1A = "baa";
+const string L2_SYLLABLE_1B = "noe";
+const string L2_SYLLABLE_3A = "suu";
+const string L2_SYLLABLE_3B = "geu";
+
+string[] middle_items = {
+    "boo",
+    "buu",
+    "daa",
+    "deu",
+    "duu",
+    "gie",
+    "goo",
+    "guu",
+    "meu",
+    "peu",
+    "puu",
+    "rie",
+    "saa",
+    "seu",
+    "soe",
+    "taa",
+    "teu",
+    "too",
+};
+
+void append_test_item(TestItem[] items, TestItem item)
+{
+    items.size = items.size + 1;
+    items[items.size - 1] = item;
+}
+
+void
+append_fam_items(TestItem[] items, string prefix, string postfix, LanguageType lt, string prosody) {
+    
+    int i = 0;
+    while (i < middle_items.size) {
+        TestItem item;
+        item.id = items.size + 1;
+        item.sndfn = prefix + "_" + middle_items[i] + "_" + postfix + "_" + prosody;
+        item.language = lt;
+        item.sound_direction = FRONT_SIDE;
+
+        append_test_item(items, item);
+
+        i++;
+    }
+}
+
+// Computes the name of the stimuli.
+int compute_fam_stimuli ()
+{
+    LanguageType lt;
+    string slt = expdb.participant.get_enum_field("language");
+    lt = slt == "l1" ? L1 : L2;
+    
+    ProsodyType prosody;
+    string sprosopdy = expdb.participant.get_enum_field("prosody");
+
+    if (lt == L1) {
+        // first 36
+        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
+        // second 36
+        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
+    }
+    else { // 2nd and 3rd argument are different
+        // first 36
+        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
+        // second 36
+        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
+    }
+
+    fam_items.shuffle(0, fam_items.size/2); // shuffle first half
+    fam_items.shuffle(fam_items.size/2, -1); // shuffle second half
+
+    if (have_flag("print-items") || have_flag("print-fam-items")) {
+        print_test_items(fam_items);
+    }
+    
+    return OK;
+}
+
+int check_stimuli_list(TestItem[] stimuli_list)
+{
+    // List is not supposed to be empty
+    if(stimuli_list.size == 0)
+    {
+        ctrl_window.show_error("A stimulus list is empty");
+        return ERROR;
+    }
+
+
+    int index = 0;
+    while( index < stimuli_list.size )
+    {
+        string full_filename = stimuli_dir() + "sounds/fam/" + stimuli_list[index].sndfn + ".wav";
+        if( !file_readable(full_filename) )
+        {
+            print_error("\"" + full_filename +"\" isn't found");
+            ctrl_window.show_error("Soundfile '" + stimuli_list[index].sndfn + "' is not readable. Does it exist?");
+            return ERROR;
+        }
+
+        index++;
+    }
+
+    return OK;
+}
+
+int load_stimuli() {
+    int status = compute_fam_stimuli();
+    if (status != OK)
+        return status;
+
+    return check_stimuli_list(fam_items);
+}
+

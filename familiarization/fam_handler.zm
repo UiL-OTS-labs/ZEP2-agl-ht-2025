@@ -16,7 +16,8 @@ HISTORY:
 
 \******************************************************************************/
 
-import test::front_page;
+import familiarization::front_page;
+import output;
 import test::left_page;
 import test::right_page;
 import validate_sound_file;
@@ -52,8 +53,6 @@ State fam_handler
 
     on_event:exit()
     {
-        lookaway.abort();
-
         stop_light(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
         control.hide_speaker_icon(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
         control.erase_clock();
@@ -61,21 +60,13 @@ State fam_handler
 
     void start_light(int mask)
     {
-        if (mask & FRONT_SIDE) test::front_page.show_animation();
-        if (mask & LEFT_SIDE) test::left_page.show_animation();
-        if (mask & RIGHT_SIDE) test::right_page.show_animation();
         control.start_light(mask);
     }
 
-
     void stop_light(int mask)
     {
-        if (mask & FRONT_SIDE) test::front_page.hide_animation();
-        if (mask & LEFT_SIDE) test::left_page.hide_animation();
-        if (mask & RIGHT_SIDE) test::right_page.hide_animation();
         control.stop_light(mask);
     }
-
 
     State idle
     {
@@ -132,7 +123,6 @@ State fam_handler
                 if (!running)
                 {
                     running = true;
-                    audio.play(event_time + 100ms);
                 }
 
                 looking.enter();
@@ -145,9 +135,6 @@ State fam_handler
     {
         on_event:entry()
         {
-            if(audio.paused)
-                audio.unpause_sound();
-
             control.start_clock(event_time);
         }
 
@@ -172,16 +159,12 @@ State fam_handler
     {
         on_event:entry()
         {
-            if (control.clock.released)
-                lookaway.start(event_time + MAX_LOOKAWAY_DURATION);
+            // Don't do anything yet.
         }
-
 
         on_event:exit()
         {
-            lookaway.abort();
         }
-
 
         on_event:message()
         {
@@ -192,33 +175,9 @@ State fam_handler
         }
     }
 
-
-    Timer lookaway
-    {
-        on_event:expire()
-        {
-            if(!sufficient_exposure_to_training_stimuli(event_time))
-                audio.pause_sound(event_time);
-            else
-            {
-                control.hide_speaker_icon(lightpos);
-                control.update_clock(event_time);
-                done(CONTINUE);
-            }
-            fam_handler.idle.enter();
-        }
-    }
-
-    bool sufficient_exposure_to_training_stimuli(time tref)
-    {
-        dur duration_left = audio.expected_finish_time-tref;
-        dur duration_played = audio.clip.file_duration - duration_left;
-        return duration_played >= MIN_EXPOSURE_DURATION;
-    }
-
     SoundPlayback audio
     {
-        bool paused;
+        int nth_stimulus = 0;
 
         init()
         {
@@ -227,7 +186,6 @@ State fam_handler
 
         // Sound source/producer object.
         SoundFile clip {}
-
 
         on_event:start()
         {
@@ -240,12 +198,25 @@ State fam_handler
             start_light(lightpos);
         }
 
-
         on_event:finish()
         {
+            FamStimOutput out;
             control.hide_speaker_icon(lightpos);
             control.update_clock(event_time);
-            done(CONTINUE);
+
+            out.trial = nth_stimulus + 1;
+            out.id = item.id;
+            out.language = item.language;
+            out.sound_direction = string(item.sound_direction);
+
+            nth_stimulus++;
+
+            if (nth_stimulus >= fam_items.size) // we're done
+                done(CONTINUE);
+            else
+                play(event_time + INTERSTIMULUS_INTERVAL);
+
+            fam_stim_output_append(out);
         }
 
         void setup_channels()
@@ -263,55 +234,40 @@ State fam_handler
 
             if(item.sound_direction & RIGHT_SIDE)
                 this.scaling[REAR_RIGHT] = sound_settings::PLAYBACK_SCALING_VOLUME;
-
-        }
-
-        void pause_sound(time tref)
-        {
-            paused = true;
-            dur time_left = audio.expected_finish_time - tref;
-            abort();
-            control.hide_speaker_icon(lightpos);
-            clip.selection_begin = clip.file_duration - time_left;
-            clip.fade_in_duration = 5ms; // Prevents step artifacts (clicks)
-        }
-
-        void unpause_sound()
-        {
-            paused = false;
-            control.show_speaker_icon(lightpos);
-            start(now());
         }
 
         void play(time tstart)
         {
-            paused = false;
-
             abort();
+
+            item = fam_items[nth_stimulus];
 
             device = sound_output_device;
 
-            clip.file = stimuli_dir() + "sounds/" + item.sndfn;
+            clip.file = stimuli_dir() + "sounds/fam/" + item.sndfn + ".wav";
             clip.selection_begin = 0s; //reset
             clip.fade_in_duration = 0s; //reset
 
             validate_sample_rate(clip);
+
+            control.set_status(
+                "trial: " + (nth_stimulus + 1) + "  id: " + string(item.id) +
+                "  direction: " + item.sound_direction);
 
             setup_channels();
             start(tstart);
         }
     }
 
-
     // Signals the initiator of the trial that we're done.
     void done(int msgid)
     {
+        front_page.hide_animation();
         signal_target(msgid);   // tell caller we're done
         target = null;
 
         control.clear_status();
     }
-
 
     //==========================================================================
 
@@ -333,7 +289,6 @@ State fam_handler
         enter();
     }
 
-
     // Performs cleaning up if necessary.
     void cleanup(time t)
     {
@@ -349,28 +304,20 @@ State fam_handler
         leave();
     }
 
-
-    void action(Object caller, TestItem it, time tref)
+    void action(Object caller, time tref)
     {
-        // Save the passed trial control parameters.
-        item = it;
-
-        // The first subtrial (audio stimulus played) will be started at
-        // first looking at the target side light. Then we become 'running'.
-        // See state machine above. All subsequent subtrials are ITI apart.
-        if (running) audio.play(tref + INTERSTIMULUS_INTERVAL);
+        audio.play(tref + INTERSTIMULUS_INTERVAL);
 
         // Show pages representing the front and side lights on the appropriate
         // test windows.
-        test_window1.show_page(test::front_page);
+        test_window1.show_page(front_page);
         test_window2.show_page(test::left_page);
         test_window3.show_page(test::right_page);
 
+        front_page.show_animation();
+
 
         // Update status line on control window. Cleared in done() above.
-        control.set_status(
-            "id: " + string(item.id) + "  direction: " +
-            item.sound_direction);
 
 
         // Remember who to signal when the trial is over.
