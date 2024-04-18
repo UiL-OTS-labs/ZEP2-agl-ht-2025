@@ -16,8 +16,8 @@ HISTORY:
 \******************************************************************************/
 
 // Import the module corresponding to the eye-tracker device being used.
-import std_et_dummy_infant;
-//import std_et_eyelink_infant;
+//import std_et_dummy_infant;
+import std_et_eyelink_infant;
 //import std_et_tobii_infant;
 
 import std_sound_playback;
@@ -81,7 +81,7 @@ EyeTracker eyetracker
         // Where to store native format eye data files if supported by
         // eye-tracker device. Not defining this directory turns off the
         // creation of native format eye data files.
-//        output_dir                  = data_dir() + script_name() + "/dat/";
+        output_dir                  = data_dir() + script_name() + "/dat/";
     }
 
 
