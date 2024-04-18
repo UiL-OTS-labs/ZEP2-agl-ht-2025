@@ -61,6 +61,42 @@ Block task
         on_event:entry()
         {
             num_cycles = 1;
+
+            int recordingnum = 1;
+            int listnum = 1;
+
+            string fn = format(expdb.session.id, 4) + "_" +
+                        format(listnum, 2) + "_" + format(recordingnum, 2);
+
+            eyetracker.open_data_file(fn);
+
+            eye_data_writer.file = fn;
+
+            // start recording data
+            eyetracker.start_stream();
+
+            // log some info
+            eyetracker.add_message(EYE_DATA_DISPLAY);
+            eyetracker.add_message(EYE_DATA_TRACKBOX);
+            eyetracker.add_message(EYE_DATA_APPLICATION);
+            eyetracker.add_message(EYE_DATA_TRACKER);
+            eyetracker.add_message(EYE_DATA_EXPERIMENT, expdb.experiment.id);
+            eyetracker.add_message(EYE_DATA_RESEARCHER, expdb.researcher.id);
+            eyetracker.add_message(EYE_DATA_PARTICIPANT, expdb.participant.id);
+            if (expdb.group != null)
+                eyetracker.add_message(EYE_DATA_GROUP, expdb.group.id);
+            eyetracker.add_message(EYE_DATA_SESSION, string(expdb.session.id));
+            eyetracker.add_message(EYE_DATA_LIST, string(listnum));
+            eyetracker.add_message(EYE_DATA_RECORDING, string(recordingnum));
+            eyetracker.add_message(EYE_DATA_TITLE, "ZEP2-agl-ht-2024");
+        }
+
+        on_event:exit()
+        {
+            eyetracker.abort();
+            eyetracker.stop_stream();
+            eye_data_writer.file = "";
+            eyetracker.close_data_file();
         }
 
         Trial trial
@@ -69,11 +105,28 @@ Block task
             {
                 fam_handler.setup();
                 fam_handler.action(this, reference_time);
+
+                eyetracker.add_message(EYE_DATA_TRIAL_START,
+                    string(familiarization.cycle) + "," +
+                    "001" + "," + "familiarization");
+
+                eyetracker.print_to_data_file("trialbeg begin familiarization");
+                eyetracker.print_to_data_file("plafile grid0.bmp");
+
+                eyetracker.set_tracker_status_message("familiarization");
             }
 
             on_event:exit()
             {
                 fam_handler.cleanup(event_time);
+
+                eyetracker.add_message(EYE_DATA_TRIAL_END,
+                    string(familiarization.cycle) + "," +
+                    "001" + "," + "familiarization");
+                
+                eyetracker.print_to_data_file("trialend end familiarization");
+
+                eyetracker.set_tracker_status_message("");
 
                 // Add new row to output table.
 

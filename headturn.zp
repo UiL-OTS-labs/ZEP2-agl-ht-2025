@@ -90,6 +90,12 @@ Experiment experiment
         {
             familiarization::action(this);
         }
+
+        on_event:exit()
+        {
+            // Retrieve native eyetracking files when applicable
+            eyetracker_device.retrieve_data_files();
+        }
     }
 
 
@@ -126,8 +132,6 @@ Experiment experiment
 
         on_event:exit()
         {
-            // Retrieve native eyetracking files when applicable
-            eyetracker_device.retrieve_data_files();
 
             // Abort audio
             sound_output_device.close();
