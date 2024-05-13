@@ -190,6 +190,12 @@ State fam_handler
         on_event:start()
         {
             signal(fam_handler, AUDIO_START);
+
+            eyetracker.add_message(EYE_DATA_STIMULUS_START, string(item.sndfn));
+
+            int dt = int(now() - start_time);
+            eyetracker.print_to_data_file("SYNCTIME" + dt);
+
             lightpos = item.sound_direction;
 
             control.show_speaker_icon(lightpos);
@@ -265,6 +271,8 @@ State fam_handler
         front_page.hide_animation();
         signal_target(msgid);   // tell caller we're done
         target = null;
+        
+        eyetracker.stop_tracking();
 
         control.clear_status();
     }
@@ -307,6 +315,7 @@ State fam_handler
     void action(Object caller, time tref)
     {
         audio.play(tref + INTERSTIMULUS_INTERVAL);
+        eyetracker.start_tracking();
 
         // Show pages representing the front and side lights on the appropriate
         // test windows.
