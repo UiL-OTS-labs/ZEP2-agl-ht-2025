@@ -1,6 +1,105 @@
 
+string[] l1_familiar = {
+    "baa_duu_geu",
+    "baa_teu_geu",
+    "noe_duu_suu",
+    "noe_taa_suu",
+};
+
+string[] l1_new_grammatical = {
+    "baa_roo_geu",
+    "baa_tie_geu",
+    "noe_roo_suu",
+    "noe_tie_suu",
+}
+
+string[] l1_ungrammatical = {
+    "geu_baa_duu",
+    "duu_geu_baa",
+    "geu_baa_taa",
+    "taa_geu_baa",
+
+    "suu_noe_duu",
+    "duu_suu_noe",
+    "suu_noe_taa",
+    "taa_suu_noe",
+}
+
+string[] l2_familiar = {
+    "baa_duu_suu",
+    "baa_taa_suu",
+    "noe_duu_geu",
+    "noe_taa_geu",
+}
+
+string[] l2_new_grammatical = {
+    "baa_roo_suu",
+    "baa_tie_suu",
+    "noe_roe_geu",
+    "noe_tie_geu",
+}
+
+string[] l2_ungrammatical = {
+    "suu_baa_duu",
+    "duu_suu_baa",
+    "suu_baa_taa",
+    "taa_suu_baa",
+
+    "geu_noe_duu",
+    "duu_geu_noe",
+    "geu_noe_taa",
+    "taa_geu_noe",
+}
+
+string[] familiar;
+string[] new_grammatical;
+string[] ungrammatical;
+
+TestItem[] block1 = {
+    {},
+    {},
+    {}
+};
+
+void
+append_suffix(string[] items, string suffix) {
+    int i;
+    while (i < items.size) {
+        items[i] += "-" + suffix;
+        i++;
+    }
+}
+
 int load_stimuli() {
     println("Create test stimuli instead of printing this message");
+
+    string slt = expdb.participant.get_enum_field("language");
+
+    ProsodyType prosody;
+    string sprosody = expdb.participant.get_enum_field("prosody");
+
+    if (slt == "l1") {
+        familiar = l1_familiar;
+        new_grammatical = l1_new_grammatical;
+        ungrammatical = l1_ungrammatical;
+    }
+    else if (slt == "l2") {
+        familiar = l2_familiar;
+        new_grammatical = l2_new_grammatical;
+        ungrammatical = l2_ungrammatical;
+    }
+    else {
+        print_error("Oops, language seems invalid");
+    }
+
+    familiar.shuffle(0,-1);
+    new_grammatical.shuffle(0,-1);
+    ungrammatical.shuffle(0,-1);
+
+    append_suffix(familiar, sprosody);
+    append_suffix(new_grammatical, sprosody);
+    append_suffix(ungrammatical, sprosody);
+
     return OK;
 }
 
