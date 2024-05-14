@@ -20,6 +20,7 @@ int create_participant_fields()
     expdb.participant.add_field("birthdate");
     expdb.participant.add_field("prosody");
     expdb.participant.add_field("language");
+    expdb.participant.add_field("testorder");
 
     return OK;
 }
@@ -39,6 +40,11 @@ string[] valid_prosody = {
 string[] valid_language = {
     "l1",
     "l2",
+};
+
+string[] valid_test_order = {
+    "order_a",
+    "order_b"
 };
 
 
@@ -106,6 +112,15 @@ int check_participant_fields()
         valid_language,
         language,
         "language"
+    );
+    if (status != OK)
+        return status;
+    
+    string testorder = expdb.participant.get_enum_field("testorder");
+    status = check_enum_field_in_array(
+        valid_test_order,
+        testorder,
+        "testorder"
     );
     return status;
 }

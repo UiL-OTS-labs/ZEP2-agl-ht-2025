@@ -133,6 +133,34 @@ FieldDefInit[] participant_attribute_defs =
         // Enumerator list.
         "l1|l2"
     },
+    {
+        // Attribute id.
+        "testorder",
+
+        // Attribute type.
+        FIELD_TYPE_ENUM,
+
+        // Attribute description.
+        "The test order for the test stimuli",
+
+        // Set if attribute may identify a person.
+        false,
+
+        // Set if attribute may contain sentitive information.
+        false,
+
+        // Set to exclude attribute from export.
+        false,
+
+        // Set to show attribute in zepman record list.
+        false,
+
+        // Set if attribute is required for experiment.
+        true,
+
+        // Not used.
+        "order_a|order_b"
+    },
 }
 
 
