@@ -33,15 +33,11 @@ const int BUTTON_HALT   = 0;
 const int BUTTON_REPEAT = 1;
 const int BUTTON_ATTENTION = 1;
 
-// Test item table.
-TestItem[..] test_items;
-
 Block task
 {
     Block test
     {
         TestItem    item;           // current item
-
 
         on_event:entry()
         {

@@ -307,6 +307,8 @@ void prepare_test_items() {
         append_test_item(test_items, block4[i]);
         i++;
     }
+
+    println ("Test items.size: " + test_items.size);
 }
 
 void
