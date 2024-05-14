@@ -16,21 +16,38 @@ enum ProsodyType
     EMPHASIZED,
 }
 
+enum TestType {
+    TT_TRAINING,
+    TT_FAMILIAR,
+    TT_NEW_GRAMMATICAL,
+    TT_UNGRAMMATICAL
+}
+
+enum TestOrder {
+    TEST_ORDER_NA,
+    TEST_ORDER_A,
+    TEST_ORDER_B,
+}
+
 
 // Item table record.
 record TestItem
 {
     int                             id;                 // item trial_num
     LanguageType                    language;           // item type
+    TestType                        test_type;          // Type of item
+    TestOrder                       order;              // To which order does this item belong
+    int                             test_block;         // which test block
     string                          sndfn;              // stimulus sound file
     std_baby_control::Direction     sound_direction;    // direction the sounds come from
 }
 
 void print_test_item(TestItem item) {
-    println( "" + item.id + "\t"
-                + item.language + "\t"
-                + item.sndfn + "\t"
-                + item.sound_direction
+    println("" + item.id + "\t"
+               + item.language + "\t"
+               + item.order + "\t"
+               + item.sndfn + "\t"
+               + item.sound_direction
     );
 
 }
