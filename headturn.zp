@@ -59,7 +59,8 @@ Experiment experiment
             flush_error();
         }
  
-        if(control.state == CONTROL_RUNNING && !error()) show_test_windows();
+        if(control.state == CONTROL_RUNNING && !error())
+            show_test_windows();
     }
 
     on_event:message()
@@ -80,6 +81,17 @@ Experiment experiment
             entry_page.add_image(stimuli_dir() + "images/doll.svg");
             entry_page.action(this);
             control.enable_button(test::BUTTON_GO);
+        }
+
+    }
+
+    TransientPart test_skip_fam
+    {
+        on_event:entry()
+        {
+            if (have_flag("skip-fam")) {
+                phase2.enter();
+            }
         }
     }
 

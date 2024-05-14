@@ -1,5 +1,5 @@
 
-/* This is a module with records shared withing all modules in all
+/* This is a module with records shared within all modules in all
    namespaces. */
 
 // Symbolic definition of item type.
