@@ -32,9 +32,9 @@ string[] valid_gender = {
 };
 
 string[] valid_prosody = {
-    "noprosody",
     "functional",
-    "emphasized"
+    "emphasized",
+    "noprosody",
 };
 
 string[] valid_language = {

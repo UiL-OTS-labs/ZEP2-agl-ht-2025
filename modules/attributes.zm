@@ -103,7 +103,7 @@ FieldDefInit[] participant_attribute_defs =
         true,
 
         // Not used.
-        "noprosody|functional|emphasized"
+        "functional|noprosody|emphasized"
     },
     {
         // Attribute id.
