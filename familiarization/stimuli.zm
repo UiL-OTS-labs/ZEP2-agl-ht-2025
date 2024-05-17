@@ -22,17 +22,19 @@ import agl_records;
 
 // L1
 // baa X geu and noe X suu
+// Things have changed 17-5-24, baa X meu and soe X goo
 const string L1_SYLLABLE_1A = "baa";
-const string L1_SYLLABLE_1B = "noe";
-const string L1_SYLLABLE_3A = "geu";
-const string L1_SYLLABLE_3B = "suu";
+const string L1_SYLLABLE_1B = "soe";
+const string L1_SYLLABLE_3A = "meu";
+const string L1_SYLLABLE_3B = "goo";
 
 // L2
 // baa X suu and noe X geu
+// Things have changed 17-5-24, baa X goo and soe X meu 
 const string L2_SYLLABLE_1A = "baa";
-const string L2_SYLLABLE_1B = "noe";
-const string L2_SYLLABLE_3A = "suu";
-const string L2_SYLLABLE_3B = "geu";
+const string L2_SYLLABLE_1B = "soe";
+const string L2_SYLLABLE_3A = "goo";
+const string L2_SYLLABLE_3B = "meu";
 
 string[] middle_items = {
     "boo",
@@ -40,19 +42,19 @@ string[] middle_items = {
     "daa",
     "deu",
     "duu",
+    "geu",
     "gie",
-    "goo",
     "guu",
-    "meu",
-    "peu",
-    "puu",
+    "noe",
     "rie",
     "saa",
     "seu",
-    "soe",
+    "suu",
     "taa",
     "teu",
     "too",
+    "peu",
+    "puu",
 };
 
 void append_test_item(TestItem[] items, TestItem item)
