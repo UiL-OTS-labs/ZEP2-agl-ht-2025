@@ -72,6 +72,7 @@ State fam_handler
     {
         on_event:entry()
         {
+            println("enter idle");
             stop_light(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
         }
 
@@ -88,7 +89,10 @@ State fam_handler
     {
         on_event:entry()
         {
+            println("enter attention resetting");
             start_light(FRONT_SIDE);
+
+            front_page.show_animation();
 
             // Only reset the clock at the first trial.
             if (!running) control.begin_clock();
@@ -111,6 +115,8 @@ State fam_handler
 
             stop_light(FRONT_SIDE | RIGHT_SIDE | LEFT_SIDE);
             start_light(lightpos);
+
+
         }
 
         on_event:message()
@@ -123,6 +129,7 @@ State fam_handler
                 if (!running)
                 {
                     running = true;
+                    audio.play(event_time + 50ms);
                 }
 
                 looking.enter();
@@ -314,7 +321,6 @@ State fam_handler
 
     void action(Object caller, time tref)
     {
-        audio.play(tref + INTERSTIMULUS_INTERVAL);
         eyetracker.start_tracking();
 
         // Show pages representing the front and side lights on the appropriate
@@ -322,9 +328,6 @@ State fam_handler
         test_window1.show_page(front_page);
         test_window2.show_page(test::left_page);
         test_window3.show_page(test::right_page);
-
-        front_page.show_animation();
-
 
         // Update status line on control window. Cleared in done() above.
 
