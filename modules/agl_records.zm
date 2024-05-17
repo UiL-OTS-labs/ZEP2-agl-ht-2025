@@ -11,9 +11,9 @@ enum LanguageType
 
 enum ProsodyType
 {
-    NOPROSODY, 
     FUNCTIONAL, 
     EMPHASIZED,
+    NOPROSODY, 
 }
 
 enum TestType {
