@@ -18,7 +18,6 @@ record FamStimOutput
 // Appends one row of data to test output table.
 void fam_stim_output_append(FamStimOutput data)
 {
-    println("Adding fam output");
     // Create new trial data record. The title (final argument) is optional
     // but recommended.
     expdb.add_trial_data_record(namespace_name, "1",
