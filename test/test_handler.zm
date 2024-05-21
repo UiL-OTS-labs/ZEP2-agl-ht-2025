@@ -101,14 +101,16 @@ State test_handler
             start_light(FRONT_SIDE);
 
             // Only reset the clock at the first trial.
-            if (!running) control.begin_clock();
+            if (!running) {
+                control.begin_clock();
+            }
         }
-
 
         on_event:message()
         {
-            if (message_arg == RESPONSE_GO)
+            if (message_arg == RESPONSE_GO) {
                 stimulus_presentation.enter();
+            }
         }
     }
 
@@ -276,7 +278,7 @@ State test_handler
 
             device = sound_output_device;
 
-            clip.file = stimuli_dir() + "sounds/" + item.sndfn;
+            clip.file = stimuli_dir() + "sounds/test/" + item.sndfn + ".wav";
 
             validate_sample_rate(clip);
 
@@ -340,7 +342,11 @@ State test_handler
         // The first subtrial (audio stimulus played) will be started at
         // first looking at the target side light. Then we become 'running'.
         // See state machine above. All subsequent subtrials are ITI apart.
-        if (running) audio.play(tref + INTERSTIMULUS_INTERVAL);
+        println("action");
+        if (running) {
+            println("action");
+            audio.play(tref + INTERSTIMULUS_INTERVAL);
+        }
 
         // Show pages representing the front and side lights on the appropriate
         // test windows.

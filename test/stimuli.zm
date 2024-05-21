@@ -2,55 +2,45 @@
 import agl_records;
 
 string[] l1_familiar = {
-    "baa_duu_geu",
-    "baa_teu_geu",
-    "noe_duu_suu",
-    "noe_taa_suu",
+    "baa_daa_meu",
+    "baa_geu_meu",
+    "soe_daa_goo",
+    "soe_geu_goo",
 };
 
 string[] l1_new_grammatical = {
-    "baa_roo_geu",
-    "baa_tie_geu",
-    "noe_roo_suu",
-    "noe_tie_suu",
+    "baa_roo_meu",
+    "baa_tie_meu",
+    "soe_roo_goo",
+    "soe_tie_goo",
 }
 
 string[] l1_ungrammatical = {
-    "geu_baa_duu",
-    "duu_geu_baa",
-    "geu_baa_taa",
-    "taa_geu_baa",
-
-    "suu_noe_duu",
-    "duu_suu_noe",
-    "suu_noe_taa",
-    "taa_suu_noe",
+    "meu_baa_daa",
+    "geu_meu_baa",
+    "daa_goo_soe",
+    "goo_soe_geu",
 }
 
 string[] l2_familiar = {
-    "baa_duu_suu",
-    "baa_taa_suu",
-    "noe_duu_geu",
-    "noe_taa_geu",
+    "baa_daa_goo",
+    "baa_geu_goo",
+    "soe_daa_meu",
+    "soe_geu_meu",
 }
 
 string[] l2_new_grammatical = {
-    "baa_roo_suu",
-    "baa_tie_suu",
-    "noe_roe_geu",
-    "noe_tie_geu",
+    "baa_roo_goo",
+    "baa_tie_goo",
+    "soe_roo_meu",
+    "soe_tie_meu",
 }
 
 string[] l2_ungrammatical = {
-    "suu_baa_duu",
-    "duu_suu_baa",
-    "suu_baa_taa",
-    "taa_suu_baa",
-
-    "geu_noe_duu",
-    "duu_geu_noe",
-    "geu_noe_taa",
-    "taa_geu_noe",
+    "daa_goo_baa",
+    "goo_baa_geu",
+    "meu_soe_daa",
+    "geu_meu_soe",
 }
 
 string[] familiar;
@@ -99,7 +89,7 @@ void
 append_suffix(string[] items, string suffix) {
     int i;
     while (i < items.size) {
-        items[i] += "-" + suffix;
+        items[i] += "_" + suffix;
         i++;
     }
 }
@@ -307,8 +297,6 @@ void prepare_test_items() {
         append_test_item(test_items, block4[i]);
         i++;
     }
-
-    println ("Test items.size: " + test_items.size);
 }
 
 void

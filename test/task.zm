@@ -53,6 +53,7 @@ Block task
                 num_cycles = MAX_TEST_SUBTRIALS;
 
                 test_handler.setup();
+                test_handler.action(this, item, reference_time);
             }
 
             on_event:exit()
@@ -63,7 +64,7 @@ Block task
                 SummaryTrialOutput trial_output = generate_summary(item, test_handler.lightpos);
                 trial_summary_output_append(trial_output);
 
-                // // Also save look/no-look durations.
+                // Also save look/no-look durations.
 
                 int nstamps = control.clock.timestamps.size - 1;
 
