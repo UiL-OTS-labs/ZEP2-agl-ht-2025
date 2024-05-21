@@ -52,6 +52,18 @@ Block task
         on_event:entry()
         {
             et_setup_page.action(this);
+            // Temporarily activate the window of the eyetracker.
+            // Otherwise, the keyboard focus is on the control window.
+            // This is for eye tracker calibration.
+            test_window1.activate();
+            
+
+        }
+
+        on_event:exit()
+        {
+            // restore the focus on the control window.
+            ctrl_window.activate();
         }
     }
 
