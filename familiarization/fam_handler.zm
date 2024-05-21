@@ -111,29 +111,22 @@ State fam_handler
     {
         on_event:entry()
         {
+            println("enter stimulus presentation");
             lightpos = item.sound_direction;
+            
+            if (!running)
+            {
+                running = true;
+                audio.play(event_time + 50ms);
+                looking.enter();
+            }
 
             stop_light(FRONT_SIDE | RIGHT_SIDE | LEFT_SIDE);
             start_light(lightpos);
-
-
         }
 
         on_event:message()
         {
-            if (message_arg == RESPONSE_GO)
-            {
-                // Infant is looking; if this is the first trial then we
-                // become 'running' and the first auditory stimulus will be
-                // started.
-                if (!running)
-                {
-                    running = true;
-                    audio.play(event_time + 50ms);
-                }
-
-                looking.enter();
-            }
         }
     }
 
@@ -142,15 +135,14 @@ State fam_handler
     {
         on_event:entry()
         {
+            println("enter looking");
             control.start_clock(event_time);
         }
-
 
         on_event:exit()
         {
             control.stop_clock(event_time);
         }
-
 
         on_event:message()
         {
@@ -166,6 +158,7 @@ State fam_handler
     {
         on_event:entry()
         {
+            println("enter not looking");
             // Don't do anything yet.
         }
 
@@ -198,10 +191,12 @@ State fam_handler
         {
             signal(fam_handler, AUDIO_START);
 
-            eyetracker.add_message(EYE_DATA_STIMULUS_START, string(item.sndfn));
+            if (!have_flag("no-et")) {
+                eyetracker.add_message(EYE_DATA_STIMULUS_START, string(item.sndfn));
 
-            int dt = int(now() - start_time);
-            eyetracker.print_to_data_file("SYNCTIME" + dt);
+                int dt = int(now() - start_time);
+                eyetracker.print_to_data_file("SYNCTIME" + dt);
+            }
 
             lightpos = item.sound_direction;
 
@@ -278,8 +273,12 @@ State fam_handler
         front_page.hide_animation();
         signal_target(msgid);   // tell caller we're done
         target = null;
+
+        if (!have_flag("no-et")) {
         
-        eyetracker.stop_tracking();
+            eyetracker.stop_tracking();
+
+        }
 
         control.clear_status();
     }
@@ -321,7 +320,9 @@ State fam_handler
 
     void action(Object caller, time tref)
     {
-        eyetracker.start_tracking();
+        if (!have_flag("no-et")) {
+            eyetracker.start_tracking();
+        }
 
         // Show pages representing the front and side lights on the appropriate
         // test windows.
