@@ -131,24 +131,26 @@ State test_handler
         // set the next lightposition pseudorandom (limit max repeats on one side)
         void set_pseudorandom_light_position()
         {
-
-            // Determine by chance the next side
             Direction next_lightpos;
-            if (random(1000) >= 500)
+            int r = random(2); // Determine by chance the next side
+            if (r == 0)
                 next_lightpos = RIGHT_SIDE;
-            else
+            else if (r == 1)
                 next_lightpos = LEFT_SIDE;
+            else
+                print_error("Programming error, r isn't 0 or 1");
 
             if(next_lightpos == lightpos)
                 samesidecount++;
-
-            if( samesidecount >= MAX_SAME_SIDE ) // force right side
+            
+            // Prevent presenting the stimulus too many times at the same side.
+            if( samesidecount >= MAX_SAME_SIDE )
             {
                 next_lightpos = next_lightpos == LEFT_SIDE ? RIGHT_SIDE : LEFT_SIDE;
                 samesidecount = 0;
             }
 
-            //set the new lightpos
+            // Set the new lightpos
             lightpos =  next_lightpos;
         }
 
@@ -170,7 +172,6 @@ State test_handler
         }
     }
 
-
     State looking
     {
         on_event:entry()
@@ -178,12 +179,10 @@ State test_handler
             control.start_clock(event_time);
         }
 
-
         on_event:exit()
         {
             control.stop_clock(event_time);
         }
-
 
         on_event:message()
         {
@@ -203,12 +202,10 @@ State test_handler
                 lookaway.start(event_time + MAX_LOOKAWAY_DURATION);
         }
 
-
         on_event:exit()
         {
             lookaway.abort();
         }
-
 
         on_event:message()
         {
@@ -228,23 +225,24 @@ State test_handler
         }
     }
 
-
     SoundPlayback audio
     {
+        int num_repetitions;
+
         init()
         {
             num_channels = sound_settings::PLAYBACK_NUM_CHANNELS;
+            reset();
         }
-
 
         // Sound source/producer object.
         SoundFile clip {}
-
 
         on_event:start()
         {
             signal(test_handler, AUDIO_START);
             control.show_speaker_icon(lightpos);
+            num_repetitions += 1;
         }
 
 
@@ -252,7 +250,15 @@ State test_handler
         {
             control.hide_speaker_icon(LEFT_SIDE | RIGHT_SIDE);
             control.update_clock(event_time);
-            done(CONTINUE);
+
+            if (num_repetitions < MAX_REPETITIONS)
+                play(event_time + INTERSTIMULUS_INTERVAL);
+            else
+                done(CONTINUE);
+        }
+
+        void reset() {
+            num_repetitions = 0;
         }
 
         void setup_channels()
@@ -313,6 +319,8 @@ State test_handler
         control.enable_key(KEY_Return, RESPONSE_GO);
         control.enable_key(KEY_Escape, RESPONSE_HALT);
 
+        audio.reset();
+
         control.reset_clock();
         enter();
     }
@@ -325,6 +333,7 @@ State test_handler
 
         control.end_clock(t);
         audio.abort();
+        audio.reset();
 
         control.disable_buttons();
         control.disable_keys();

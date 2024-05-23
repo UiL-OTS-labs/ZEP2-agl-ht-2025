@@ -102,6 +102,7 @@ create_test_item(LanguageType language, TestOrder order, int block) {
     init.language = language;
     init.order = order;
     init.test_block = block;
+    init.sound_direction = PSEUDO_RANDOM_SIDE;
 
     return init; 
 }
