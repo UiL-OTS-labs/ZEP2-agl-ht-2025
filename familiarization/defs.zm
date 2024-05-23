@@ -28,4 +28,4 @@ const dur       MAX_LOOKAWAY_DURATION           = 2000ms;
 const dur       MIN_EXPOSURE_DURATION           = MAX_LOOKAWAY_DURATION;
 
 // Duration of the interval between two subtrials.
-const dur       INTERSTIMULUS_INTERVAL          = 750ms;
+const dur       INTERSTIMULUS_INTERVAL          = 650ms;
