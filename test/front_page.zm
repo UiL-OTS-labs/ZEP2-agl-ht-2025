@@ -42,30 +42,28 @@ Page front_page
             }
 
 
-            CircleShape attention
+            ImageShape attention
             {
                 init()
                 {
-                    radius = 200;
-                    line_width = 10;
-                    line_pattern_color = color:black;
-                    fill_pattern_color = CONTROL_FRONT_LIGHT_COLOR;
+                    string image_fn = stimuli_dir() + "images/";
+                    image_fn += "doll" + ".png";
+                    image = image_fn;
+                    real ratio = image_height / image_width;
+                    width = canvas.width / 4;
+                    height= width * ratio;
+                    x = -width/2;
+                    y = -height/2;
                 }
-
-
-                on_event:pre_start()
-                {
-                    is_visible = true;
-                }
-
 
                 on_event:pre_update()
                 {
-                    real t = real(now() - expected_start_time) / 1e3;
-
-                    // Scaling: 0.5 Hz, 0.25 amplitude
-                    scaling_x = 1 + 0.25 * sin(2.0 * M_PI * 0.5 * t);
-                    scaling_y = scaling_x;
+                    dur frame_dur = display_device.num_frames_to_duration(
+                        front_page.window.actual_head,
+                        1
+                    );
+                    real dur_cumulative = relative_frame * 1/ real(frame_dur);
+                    rotation = dur_cumulative;
                 }
             }
         }
