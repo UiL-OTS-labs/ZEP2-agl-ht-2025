@@ -26,7 +26,6 @@ import stimuli;
 import output;
 import fam_handler;
 import std_blank_page;
-import repeat_query_page;
 
 import eyetracker_infant;
 import et_setup_page;
@@ -181,33 +180,6 @@ Block task
                 }
 
                 save_trial_data();
-            }
-        }
-    }
-
-    Part repeat_query
-    {
-        on_event:entry()
-        {
-            blank_page.action(null, 2s);
-            repeat_query_page.action(this,
-                "<b>Should the training phase be repeated?</b>\n\n"
-                "Press the <i>middle</i> button (or space) to <u>repeat</u> training.\n\n"
-                "Press any <i>other</i> button/key other to <u>continue</u> to test."
-            );
-        }
-    }
-
-    TransientPart repeat_option
-    {
-        int number_of_repeats;
-
-        on_event:entry()
-        {
-            if(repeat_query_page.repeat_flag)
-            {
-                familiarization.enter();
-                number_of_repeats++;
             }
         }
     }
