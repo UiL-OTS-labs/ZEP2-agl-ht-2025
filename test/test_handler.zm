@@ -351,9 +351,7 @@ State test_handler
         // The first subtrial (audio stimulus played) will be started at
         // first looking at the target side light. Then we become 'running'.
         // See state machine above. All subsequent subtrials are ITI apart.
-        println("action");
         if (running) {
-            println("action");
             audio.play(tref + INTERSTIMULUS_INTERVAL);
         }
 
