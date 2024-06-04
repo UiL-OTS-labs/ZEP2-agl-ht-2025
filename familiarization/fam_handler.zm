@@ -216,6 +216,8 @@ State fam_handler
             out.id = item.id;
             out.language = item.language;
             out.sound_direction = string(item.sound_direction);
+            out.ms_start = int(audio.start_time - zero_time());
+            out.ms_stop = int(audio.finish_time - zero_time());
 
             nth_stimulus++;
 
