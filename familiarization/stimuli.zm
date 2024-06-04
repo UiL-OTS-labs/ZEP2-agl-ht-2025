@@ -57,6 +57,9 @@ string[] middle_items = {
     "puu",
 };
 
+TestItem[] temp_fam_items = {}; // stimuli without noise.
+TestItem[] temp_noise_items = {};
+
 void append_test_item(TestItem[] items, TestItem item)
 {
     items.size = items.size + 1;
@@ -80,6 +83,20 @@ append_fam_items(TestItem[] items, string prefix, string postfix, LanguageType l
     }
 }
 
+void append_noise_items(TestItem []items, string prosody) {
+    int i = 0;
+    while (i < NUM_NOISE_ITEMS_TOT) {
+        TestItem item;
+        item.id = items.size + 1;
+        item.sndfn = "noise_" + string(item.id) + "_" + prosody;
+        item.language = NOISE;
+        item.sound_direction = FRONT_SIDE;
+
+        append_test_item(items, item);
+        i++;
+    }
+}
+
 // Computes the name of the stimuli.
 int compute_fam_stimuli ()
 {
@@ -92,29 +109,34 @@ int compute_fam_stimuli ()
 
     if (lt == L1) {
         // first 36
-        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
-        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
+        append_fam_items(temp_fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(temp_fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
         // second 36
-        append_fam_items(fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
-        append_fam_items(fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
+        append_fam_items(temp_fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(temp_fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
     }
     else { // 2nd and 3rd argument are different
         // first 36
-        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
-        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
+        append_fam_items(temp_fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(temp_fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
         // second 36
-        append_fam_items(fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
-        append_fam_items(fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
+        append_fam_items(temp_fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
+        append_fam_items(temp_fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
     }
 
-    fam_items.shuffle(0, fam_items.size/2); // shuffle first half
-    fam_items.shuffle(fam_items.size/2, -1); // shuffle second half
+    temp_fam_items.shuffle(0, temp_fam_items.size/2); // shuffle first half
+    temp_fam_items.shuffle(temp_fam_items.size/2, -1); // shuffle second half
 
-    if (have_flag("print-items") || have_flag("print-fam-items")) {
-        print_test_items(fam_items);
-    }
-    
     return OK;
+}
+
+void
+compute_noise_stimuli() {
+    string sprosopdy = expdb.participant.get_enum_field("prosody");
+
+    append_noise_items(temp_noise_items, sprosopdy);
+    temp_noise_items.shuffle(0, -1);
+    temp_noise_items.size = NUM_NOISE_ITEMS_USED;
 }
 
 int check_stimuli_list(TestItem[] stimuli_list)
@@ -144,10 +166,34 @@ int check_stimuli_list(TestItem[] stimuli_list)
     return OK;
 }
 
+void
+create_final_fam_list() {
+    int i = 0;
+
+    while (i < temp_noise_items.size) {
+        append_test_item(fam_items, temp_noise_items[i]);
+        i++;
+    }
+    i = 0;
+
+    while (i < temp_fam_items.size) {
+        append_test_item(fam_items, temp_fam_items[i]);
+        i++;
+    }
+}
+
 int load_stimuli() {
     int status = compute_fam_stimuli();
     if (status != OK)
         return status;
+
+    compute_noise_stimuli();
+
+    create_final_fam_list();
+    
+    if (have_flag("print-items") || have_flag("print-fam-items")) {
+        print_test_items(fam_items);
+    }
 
     return check_stimuli_list(fam_items);
 }
