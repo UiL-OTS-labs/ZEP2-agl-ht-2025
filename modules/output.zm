@@ -24,6 +24,7 @@ record SummaryTrialOutput
     int         id; // the nth stimulus
 
     LanguageType language_type;
+    TestType    test_type;
 
     string      stimulus;
 
@@ -50,6 +51,7 @@ SummaryTrialOutput generate_summary(TestItem item, Direction sound_direction)
 {
     SummaryTrialOutput trial_output;
     trial_output.language_type    = item.language;
+    trial_output.test_type        = item.test_type;
     trial_output.stimulus         = substring(item.sndfn, 0, item.sndfn.length-4);
 
     trial_output.id               = item.id;
@@ -81,8 +83,14 @@ void trial_summary_output_append(SummaryTrialOutput data)
     // Set column values of the trial data record. The descriptions (final
     // arguments) are optional but recommended.
 
-    expdb.set_trial_data_enum_field("language_type", string(data.language_type),
-    "`L1`, `L2`");
+    expdb.set_trial_data_enum_field (
+        "language_type",
+        string(data.language_type),
+        "`L1`, `L2`"
+    );
+
+    expdb.set_trial_data_enum_field("test_type", string(data.test_type),
+        "TT_TRAINING, TT_FAMILIAR, TT_NEW_GRAMMATICAL, TT_UNGRAMMATICAL");
 
     expdb.set_trial_data_string_field("stimulus", data.stimulus,
     "`training`, the actual sound file that was playing");
