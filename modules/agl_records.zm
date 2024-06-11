@@ -41,6 +41,7 @@ record TestItem
     int                             test_block;         // which test block
     string                          sndfn;              // stimulus sound file
     std_baby_control::Direction     sound_direction;    // direction the sounds come from
+    int                             serial_code;        // The code 0-255 send to serial port
 }
 
 void print_test_item(TestItem item) {
