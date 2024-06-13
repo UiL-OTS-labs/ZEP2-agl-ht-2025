@@ -1,0 +1,19 @@
+
+plugin zep_iospp;
+
+SPP spp
+{
+    init()
+    {
+        open(0);
+
+        if (error()) {
+            terminate "Unable to open parallel port";
+        }
+    }
+
+    cleanup()
+    {
+        close();
+    }
+}
