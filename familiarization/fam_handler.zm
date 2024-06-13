@@ -188,6 +188,7 @@ State fam_handler
 
         // Sound source/producer object.
         SoundFile clip {}
+        SilenceGenerator silence {}
 
         on_event:start()
         {
@@ -275,6 +276,16 @@ State fam_handler
             clip.file = stimuli_dir() + "sounds/fam/" + item.sndfn + ".wav";
             clip.selection_begin = 0s; //reset
             clip.fade_in_duration = 0s; //reset
+
+            dur stim_dur = INTER_STIMULUS_ONSET_INTERVAL - INTERSTIMULUS_INTERVAL;
+
+            if (clip.file_duration > stim_dur) {
+                print_error(clip.file + " >= " + int(stim_dur));
+            }
+
+            dur silence_dur = stim_dur - clip.file_duration;
+
+            silence.duration = silence_dur;
 
             validate_sample_rate(clip);
 

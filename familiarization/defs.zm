@@ -28,7 +28,10 @@ const dur       MAX_LOOKAWAY_DURATION           = 2000ms;
 const dur       MIN_EXPOSURE_DURATION           = MAX_LOOKAWAY_DURATION;
 
 // Duration of the interval between two subtrials.
-const dur       INTERSTIMULUS_INTERVAL          = 650ms;
+const dur       INTERSTIMULUS_INTERVAL          = 50ms;
+
+// Duration between the start of two consecutive trials
+const dur       INTER_STIMULUS_ONSET_INTERVAL   = 4s;
 
 const int       NUM_NOISE_ITEMS_TOT             = 36;
 const int       NUM_NOISE_ITEMS_USED            = 18;
