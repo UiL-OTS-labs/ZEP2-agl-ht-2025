@@ -179,6 +179,7 @@ State fam_handler
     SoundPlayback audio
     {
         int nth_stimulus = 0;
+        string log_trial_name;
 
         init()
         {
@@ -197,6 +198,17 @@ State fam_handler
             if (!have_flag("no-et")) {
                 eyetracker.add_message(EYE_DATA_STIMULUS_START, string(item.sndfn));
 
+                string log_trial_name; 
+                if (nth_stimulus < NUM_NOISE_ITEMS_USED) {
+                    log_trial_name = "noise_" + (nth_stimulus + 1);
+                }
+                else {
+                    log_trial_name = "familiarization_" + (nth_stimulus + 1 - NUM_NOISE_ITEMS_USED);
+                }
+                eyetracker.print_to_data_file("start_trial" + " " + log_trial_name);
+                eyetracker.print_to_data_file("start_phase" + " " + log_trial_name);
+                eyetracker.print_to_data_file("var stimulus " + item.sndfn);
+
                 int dt = int(now() - start_time);
                 eyetracker.print_to_data_file("SYNCTIME" + dt);
             }
@@ -214,6 +226,9 @@ State fam_handler
             FamStimOutput out;
             control.hide_speaker_icon(lightpos);
             control.update_clock(event_time);
+
+            eyetracker.print_to_data_file("end_phase" + " " + log_trial_name);
+            eyetracker.print_to_data_file("end_trial");
 
             out.trial = nth_stimulus + 1;
             out.id = item.id;
