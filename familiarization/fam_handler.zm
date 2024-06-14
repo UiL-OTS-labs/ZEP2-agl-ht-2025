@@ -179,7 +179,7 @@ State fam_handler
     SoundPlayback audio
     {
         int nth_stimulus = 0;
-        string log_trial_name;
+        string log_trial_name; 
 
         init()
         {
@@ -199,7 +199,6 @@ State fam_handler
             if (!have_flag("no-et")) {
                 eyetracker.add_message(EYE_DATA_STIMULUS_START, string(item.sndfn));
 
-                string log_trial_name; 
                 if (nth_stimulus < NUM_NOISE_ITEMS_USED) {
                     log_trial_name = "noise_" + (nth_stimulus + 1);
                 }
@@ -228,7 +227,7 @@ State fam_handler
             control.hide_speaker_icon(lightpos);
             control.update_clock(event_time);
 
-            eyetracker.print_to_data_file("end_phase" + " " + log_trial_name);
+            eyetracker.print_to_data_file("end_phase");
             eyetracker.print_to_data_file("end_trial");
 
             out.trial = nth_stimulus + 1;
