@@ -5,10 +5,12 @@ SPP spp
 {
     init()
     {
-        open(0);
+        if (!have_flag("no-spp")) { // Handy for piloting.
+            open(0);
 
-        if (error()) {
-            terminate "Unable to open parallel port";
+            if (error()) {
+                terminate "Unable to open parallel port";
+            }
         }
     }
 

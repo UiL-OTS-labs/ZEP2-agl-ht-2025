@@ -194,7 +194,9 @@ State fam_handler
         {
             signal(fam_handler, AUDIO_START);
 
-            spp.write_data(item.serial_code);
+            if (!have_flag("--no-spp")) {
+                spp.write_data(item.serial_code);
+            }
 
             if (!have_flag("no-et")) {
                 eyetracker.add_message(EYE_DATA_STIMULUS_START, string(item.sndfn));
