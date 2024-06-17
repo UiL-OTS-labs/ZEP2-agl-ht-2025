@@ -872,6 +872,8 @@ void show_test_windows()
     test_window2.show();
     test_window1.show();
 
+    // Setting these parameters only have effect after the window has been
+    // shown
     test_window1.size = 1100, 800;
     test_window1.x = (1920 - 1100) /2;
     test_window1.y = 0;  
@@ -956,7 +958,6 @@ void position_test_windows(bool home=false)
         test_window1.target_head = TEST_WINDOW1_TARGET_HEAD;
         test_window1.virtual_size = 0, 0;
         test_window1.is_fullscreen = false;
-        test_window1.size = 1280,1024
 
         ctrl_window.target_head = CTRL_WINDOW_TARGET_HEAD;
         ctrl_window.is_fullscreen = true;
