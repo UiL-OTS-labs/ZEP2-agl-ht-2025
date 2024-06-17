@@ -194,7 +194,7 @@ State fam_handler
         {
             signal(fam_handler, AUDIO_START);
 
-            if (!have_flag("--no-spp")) {
+            if (!have_flag("no-spp")) {
                 spp.write_data(item.serial_code);
             }
 
