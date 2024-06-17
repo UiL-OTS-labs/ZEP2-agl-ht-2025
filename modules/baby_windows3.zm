@@ -55,7 +55,7 @@ NormalWindow test_window1
     {
         alignment_and_relative_size = ALIGN_CENTER, ALIGN_BEGIN, 30, 30;
         background = WINDOW_COLOR;
-        title = "1";
+        title = "stimuli";
 
         if (os_name() == "Windows")
         {
@@ -872,6 +872,10 @@ void show_test_windows()
     test_window2.show();
     test_window1.show();
 
+    test_window1.size = 1100, 800;
+    test_window1.x = (1920 - 1100) /2;
+    test_window1.y = 0;  
+
     ctrl_window.hide();
     ctrl_window.show();
 }
@@ -951,7 +955,8 @@ void position_test_windows(bool home=false)
         test_window2.is_fullscreen = true;
         test_window1.target_head = TEST_WINDOW1_TARGET_HEAD;
         test_window1.virtual_size = 0, 0;
-        test_window1.is_fullscreen = true;
+        test_window1.is_fullscreen = false;
+        test_window1.size = 1280,1024
 
         ctrl_window.target_head = CTRL_WINDOW_TARGET_HEAD;
         ctrl_window.is_fullscreen = true;

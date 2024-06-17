@@ -64,11 +64,11 @@ EyeTracker eyetracker
         cross_fade_focus_target     = false;
 
         // Maximum/minimum target width at begin/end of focus phase [px].
-        max_target_size             = 150;
+        max_target_size             = 250;
         min_target_size             = 40;
 
         // Base width of (unmodulated) target [px].
-        setup_target_size           = 150;
+        setup_target_size           = 250;
 
         // Amplitude and frequency of target size modulation.
         target_size_mod             = 0.0;      // 0..1
