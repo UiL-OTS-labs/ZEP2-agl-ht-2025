@@ -16,7 +16,7 @@ const CalibrationType CALIBRATION_TYPE          = CALIBRATION_TYPE_3B;
 
 // Manual or auto-paced calibration. For infants you may want to trigger
 // calibration targets manually.
-const bool      MANUAL_CALIBRATION              = true;
+const bool      MANUAL_CALIBRATION              = false;
 
 // Analyzer configuration.
 //   standard (cognition):                  0
