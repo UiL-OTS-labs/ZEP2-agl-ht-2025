@@ -47,6 +47,8 @@ string[] familiar;
 string[] new_grammatical;
 string[] ungrammatical;
 
+int[] rand_vals = {};
+
 TestItem[] block1 = {
     {},
     {},
@@ -330,10 +332,44 @@ prepare_stimuli_lists() {
     append_suffix(ungrammatical, sprosody);
 }
 
+void
+set_stimulus_direction() {
+    int i;
+    rand_vals.size = test_items.size;
+
+    // assign 1 to lower half of rand items
+    while (i < rand_vals.size/2) {
+        rand_vals[i] = 1;
+        i++;
+    }
+    rand_vals.shuffle(0, -1);
+
+    i = 0;
+    while (i < test_items.size) {
+        if (rand_vals[i] == 0)
+            test_items[i].sound_direction = LEFT_SIDE;
+        else
+            test_items[i].sound_direction = RIGHT_SIDE;
+        i++;
+    }
+}
+
+void
+set_trial_numbers() {
+    int i = 0;
+    while (i < test_items.size) {
+        test_items[i].id = i + 1;
+        i++;
+    }
+}
+
 int load_stimuli() {
 
     prepare_stimuli_lists();
     prepare_test_items();
+
+    set_stimulus_direction();
+    set_trial_numbers();
 
     return OK;
 }
