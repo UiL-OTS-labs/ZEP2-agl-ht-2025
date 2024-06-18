@@ -34,4 +34,4 @@ const dur       INTERSTIMULUS_INTERVAL          = 50ms;
 const dur       INTER_STIMULUS_ONSET_INTERVAL   = 4s;
 
 const int       NUM_NOISE_ITEMS_TOT             = 36;
-const int       NUM_NOISE_ITEMS_USED            = 18;
+const int       NUM_NOISE_ITEMS_USED            = 9;
