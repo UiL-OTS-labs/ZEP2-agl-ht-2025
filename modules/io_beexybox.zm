@@ -1,0 +1,49 @@
+/******************************************************************************\
+FILE:           io_beexybox.zm
+AUTHOR:         Theo Veenker <theo.veenker@beexy.nl>
+ADAPTED BY:     -
+
+DESCRIPTION:
+
+Provides BeexyBox based response box object.
+
+\******************************************************************************/
+
+
+plugin zep_iobeexybox;
+
+import io_beexybox_settings;
+
+
+BeexyBox io_beexybox
+{
+    init()
+    {
+        if (IO_BEEXYBOX_DEVICE_NAME != "")
+            open(IO_BEEXYBOX_DEVICE_NAME);
+        else
+            open();
+//        if (error()) terminate;
+        if (error()) return;
+    }
+
+
+    cleanup()
+    {
+        close();
+    }
+
+
+    on_event:press()
+    {
+        control.handle_button(input_button);
+    }
+
+
+/*
+    on_event:voicekey()
+    {
+        control.handle_voicekey(voicekey_action);
+    }
+*/
+}
