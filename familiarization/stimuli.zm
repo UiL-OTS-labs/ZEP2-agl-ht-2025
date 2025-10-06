@@ -76,7 +76,6 @@ append_fam_items(TestItem[] items, string prefix, string postfix, LanguageType l
         item.sndfn = prefix + "_" + middle_items[i] + "_" + postfix + "_" + prosody;
         item.language = lt;
         item.sound_direction = FRONT_SIDE;
-        item.serial_code = SPP_DATA_BIT_1;
 
         append_test_item(items, item);
 
@@ -92,7 +91,6 @@ void append_noise_items(TestItem []items, string prosody) {
         item.sndfn = "noise_" + string(item.id) + "_" + prosody;
         item.language = NOISE;
         item.sound_direction = FRONT_SIDE;
-        item.serial_code = SPP_DATA_BIT_0;
 
         append_test_item(items, item);
         i++;

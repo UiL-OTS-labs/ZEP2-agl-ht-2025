@@ -21,7 +21,6 @@ import output;
 import test::left_page;
 import test::right_page;
 import validate_sound_file;
-import spp;
 
 // Symbolic definition of responses/events.
 enum TestEvent {
@@ -193,10 +192,6 @@ State fam_handler
         on_event:start()
         {
             signal(fam_handler, AUDIO_START);
-
-            if (!have_flag("no-spp")) {
-                spp.write_data(item.serial_code);
-            }
 
             if (!have_flag("no-et")) {
                 eyetracker.add_message(EYE_DATA_STIMULUS_START, string(item.sndfn));
