@@ -58,7 +58,6 @@ string[] middle_items = {
 };
 
 TestItem[] temp_fam_items = {}; // stimuli without noise.
-TestItem[] temp_noise_items = {};
 
 void append_test_item(TestItem[] items, TestItem item)
 {
@@ -79,20 +78,6 @@ append_fam_items(TestItem[] items, string prefix, string postfix, LanguageType l
 
         append_test_item(items, item);
 
-        i++;
-    }
-}
-
-void append_noise_items(TestItem []items, string prosody) {
-    int i = 0;
-    while (i < NUM_NOISE_ITEMS_TOT) {
-        TestItem item;
-        item.id = items.size + 1;
-        item.sndfn = "noise_" + string(item.id) + "_" + prosody;
-        item.language = NOISE;
-        item.sound_direction = FRONT_SIDE;
-
-        append_test_item(items, item);
         i++;
     }
 }
@@ -130,15 +115,6 @@ int compute_fam_stimuli ()
     return OK;
 }
 
-void
-compute_noise_stimuli() {
-    string sprosopdy = expdb.participant.get_enum_field("prosody");
-
-    append_noise_items(temp_noise_items, sprosopdy);
-    temp_noise_items.shuffle(0, -1);
-    temp_noise_items.size = NUM_NOISE_ITEMS_USED;
-}
-
 int check_stimuli_list(TestItem[] stimuli_list)
 {
     // List is not supposed to be empty
@@ -148,7 +124,6 @@ int check_stimuli_list(TestItem[] stimuli_list)
         return ERROR;
     }
 
-
     int index = 0;
     while( index < stimuli_list.size )
     {
@@ -156,7 +131,9 @@ int check_stimuli_list(TestItem[] stimuli_list)
         if( !file_readable(full_filename) )
         {
             print_error("\"" + full_filename +"\" isn't found");
-            ctrl_window.show_error("Soundfile '" + stimuli_list[index].sndfn + "' is not readable. Does it exist?");
+            ctrl_window.show_error(
+                    "Soundfile '" + stimuli_list[index].sndfn +
+                    "' is not readable. Does it exist?");
             return ERROR;
         }
 
@@ -170,12 +147,6 @@ void
 create_final_fam_list() {
     int i = 0;
 
-    while (i < temp_noise_items.size) {
-        append_test_item(fam_items, temp_noise_items[i]);
-        i++;
-    }
-    i = 0;
-
     while (i < temp_fam_items.size) {
         append_test_item(fam_items, temp_fam_items[i]);
         i++;
@@ -186,8 +157,6 @@ int load_stimuli() {
     int status = compute_fam_stimuli();
     if (status != OK)
         return status;
-
-    compute_noise_stimuli();
 
     create_final_fam_list();
     
