@@ -29,6 +29,7 @@ import std_blank_page;
 
 import eyetracker_infant;
 import et_setup_page;
+import fam_constants;
 
 // Familiarization item table.
 TestItem[..] fam_items;
@@ -124,62 +125,83 @@ Block task
             }
         }
 
-        Trial trial
+        Block training_blocks
         {
-            on_event:entry()
-            {
-                fam_handler.setup();
-                fam_handler.action(this, reference_time);
-
-                if (!have_flag("no-et")) {
-                    eyetracker.add_message(EYE_DATA_TRIAL_START,
-                            string(familiarization.cycle) + "," +
-                            "001" + "," + "familiarization");
-
-                    eyetracker.print_to_data_file("trialbeg begin familiarization");
-                    eyetracker.print_to_data_file("plafile grid0.bmp");
-
-                    eyetracker.set_tracker_status_message("familiarization");
-                }
+            entry() {
+                num_cycles = NUM_FAM_BLOCKS;
             }
 
-            on_event:exit()
+            // One trial is an attention grabber and 6 stimuli.
+            // The fam_handler will handle this.
+            Trial trial
             {
-                fam_handler.cleanup(event_time);
+                TestItem[] block_items = {};
 
-                if (!have_flag("no-et")) {
-                    eyetracker.add_message(EYE_DATA_TRIAL_END,
-                        string(familiarization.cycle) + "," +
-                        "001" + "," + "familiarization");
-                    
-                    eyetracker.print_to_data_file("trialend end familiarization");
-
-                    eyetracker.set_tracker_status_message("");
-                }
-
-                // Add new row to output table.
-
-                // Also save look/no-look durations.
-
-                int nstamps = control.clock.timestamps.size - 1;
-
-                int index;
-                while (index < nstamps)
+                on_event:entry()
                 {
-                    time lasttimestamp = control.clock.timestamps[index];
-                    SingleEpochOutput epoch_output;
+                    block_items.size = NUM_STIMULI_PER_BLOCK;
+                    int start  = training_blocks.cycle * NUM_STIMULI_PER_BLOCK;
 
-                    epoch_output.duration       = dur_to_seconds(control.clock.timestamps[index+1] - lasttimestamp); // seconds
-                    epoch_output.duration_ms    = int(control.clock.timestamps[index+1] - lasttimestamp);
-                    epoch_output.epoch_type     = (index & 1) ? "NOTLOOKING" : "LOOKING";
-                    epoch_output.snd_direction  = "front";
+                    // Populate the current block items.
+                    int i = 0;
+                    while (i < NUM_STIMULI_PER_BLOCK) {
+                        block_items[i] = fam_items[start + i];
+                        i++;
+                    }
 
-                    looknolook_output_append(epoch_output);
+                    fam_handler.setup();
+                    fam_handler.action(this, reference_time, block_items);
 
-                    index++;
+                    if (!have_flag("no-et")) {
+                        eyetracker.add_message(EYE_DATA_TRIAL_START,
+                                string(familiarization.cycle) + "," +
+                                "001" + "," + "familiarization");
+
+                        eyetracker.print_to_data_file("trialbeg begin familiarization");
+                        eyetracker.print_to_data_file("plafile grid0.bmp");
+
+                        eyetracker.set_tracker_status_message("familiarization");
+                    }
                 }
 
-                save_trial_data();
+                on_event:exit()
+                {
+                    fam_handler.cleanup(event_time);
+
+                    if (!have_flag("no-et")) {
+                        eyetracker.add_message(EYE_DATA_TRIAL_END,
+                            string(familiarization.cycle) + "," +
+                            "001" + "," + "familiarization");
+                        
+                        eyetracker.print_to_data_file("trialend end familiarization");
+
+                        eyetracker.set_tracker_status_message("");
+                    }
+
+                    // Add new row to output table.
+
+                    // Also save look/no-look durations.
+
+                    int nstamps = control.clock.timestamps.size - 1;
+
+                    int index;
+                    while (index < nstamps)
+                    {
+                        time lasttimestamp = control.clock.timestamps[index];
+                        SingleEpochOutput epoch_output;
+
+                        epoch_output.duration       = dur_to_seconds(control.clock.timestamps[index+1] - lasttimestamp); // seconds
+                        epoch_output.duration_ms    = int(control.clock.timestamps[index+1] - lasttimestamp);
+                        epoch_output.epoch_type     = (index & 1) ? "NOTLOOKING" : "LOOKING";
+                        epoch_output.snd_direction  = "front";
+
+                        looknolook_output_append(epoch_output);
+
+                        index++;
+                    }
+
+                    save_trial_data();
+                }
             }
         }
     }

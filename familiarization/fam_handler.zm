@@ -345,7 +345,7 @@ State fam_handler
         leave();
     }
 
-    void action(Object caller, time tref)
+    void action(Object caller, time tref, TestItem[] items)
     {
         if (!have_flag("no-et")) {
             eyetracker.start_tracking();

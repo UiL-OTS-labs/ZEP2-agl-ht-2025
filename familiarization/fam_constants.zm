@@ -1,0 +1,4 @@
+
+
+const int NUM_FAM_BLOCKS = 8;
+const int NUM_STIMULI_PER_BLOCK = 6;
