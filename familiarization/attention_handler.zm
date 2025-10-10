@@ -1,0 +1,205 @@
+/******************************************************************************\
+FILE:           fam_handler.zm
+AUTHOR:         Theo Veenker <theo.veenker@beexy.nl>
+ADAPTED BY:     -
+
+DESCRIPTION:
+
+Provides a state machine to handle the head-turn procedure contingency for
+the lights only. Once started the auditory stimuli continue independently.
+It controls the lights through the experiment control page.
+
+
+HISTORY:
+2012-02-20 TV   Created.
+2017-05-26 TV   Adapted for Zep 2.0.
+
+\******************************************************************************/
+
+import familiarization::front_page;
+import output;
+import test::left_page;
+import test::right_page;
+import validate_sound_file;
+
+// Symbolic definition of responses/events.
+enum TestEvent {
+    RESPONSE_GO,
+    RESPONSE_START_ATTENTION,
+    RESPONSE_HALT,
+    AUDIO_START,
+    AUDIO_FINISH,
+    TRAINING_REPEAT,
+}
+
+
+State attention_handler
+{
+    Direction   lightpos;       // which side light is presented
+
+    init()
+    {
+        lightpos = FRONT_SIDE;
+    }
+
+
+    on_event:exit()
+    {
+        stop_light(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
+        control.hide_speaker_icon(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
+        control.erase_clock();
+    }
+
+    void start_light(int mask)
+    {
+        control.start_light(mask);
+    }
+
+    void stop_light(int mask)
+    {
+        control.stop_light(mask);
+    }
+
+    State attention_start
+    {
+        on_event:entry()
+        {
+            println("Start attention");
+        }
+    }
+
+    State stimulus_presentation
+    {
+        on_event:entry()
+        {
+            start_light(FRONT_SIDE);
+            front_page.show_animation(); // TODO background_stimulus is not the attention grabber
+            
+            running = true;
+            audio.play(event_time + 50ms);
+
+            stop_light(FRONT_SIDE | RIGHT_SIDE | LEFT_SIDE);
+            start_light(FONT_SIDE);
+        }
+
+        on_event:message()
+        {
+        }
+    }
+
+    SoundPlayback audio
+    {
+        int nth_stimulus = 0;
+        string log_trial_name; 
+
+        init()
+        {
+            num_channels = sound_settings::PLAYBACK_NUM_CHANNELS;
+        }
+
+        // Sound source/producer object.
+        SoundFile clip {}
+
+        on_event:start()
+        {
+            control.show_speaker_icon(FRONT_SIDE);
+
+            stop_light(FRONT_SIDE | RIGHT_SIDE | LEFT_SIDE);
+            start_light(lightpos);
+        }
+
+        on_event:finish()
+        {
+            control.hide_speaker_icon(lightpos);
+            control.update_clock(event_time);
+
+            // Restart the stimulus here.
+            play(event_time + 2s);
+        }
+
+        void setup_channels()
+        {
+            this.scaling_all = 0;
+
+            // Always play from the front
+            this.scaling[FRONT_RIGHT] = sound_settings::PLAYBACK_SCALING_VOLUME;
+            this.scaling[FRONT_LEFT] = sound_settings::PLAYBACK_SCALING_VOLUME;
+        }
+
+        void play(time tstart)
+        {
+            abort();
+
+
+            device = sound_output_device;
+
+            string giggle_fn = stimuli_dir() + "sounds/fam/" + "giggle.wav";
+            clip.file = giggle_fn
+
+            validate_sample_rate(clip);
+
+            control.set_status("attention grabber");
+
+            setup_channels();
+            start(tstart);
+        }
+    }
+
+    // Signals the initiator of the trial that we're done.
+    void done(int msgid)
+    {
+        front_page.hide_animation();
+        signal_target(msgid);   // tell caller we're done
+        target = null;
+
+        control.clear_status();
+    }
+
+    //==========================================================================
+
+
+    // Performs preparatory work required before using this page.
+    void setup()
+    {
+        // Enable response box buttons and fallback keyboard keys.
+        control.target = this;
+        control.disable_buttons();
+        control.disable_keys();
+        control.enable_button(test::BUTTON_GO, RESPONSE_GO);
+        control.enable_button(test::BUTTON_ATTENTION, RESPONSE_START_ATTENTION);
+        control.enable_button(test::BUTTON_HALT, RESPONSE_HALT);
+        control.enable_key(KEY_Return, RESPONSE_GO);
+        control.enable_key(KEY_Escape, RESPONSE_HALT);
+
+        control.reset_clock();
+
+
+        // TODO // Check whether this is desired perhaps better in action...
+        enter();
+    }
+
+    // Performs cleaning up if necessary.
+    void cleanup(time t)
+    {
+        control.end_clock(t);
+        audio.abort();
+
+        control.disable_buttons();
+        control.disable_keys();
+        control.target = null;
+
+        leave();
+    }
+
+    void action(Object caller, time tref, TestItem[] items)
+    {
+        // Show pages representing the front and side lights on the appropriate
+        // test windows.
+        test_window1.show_page(front_page);
+        test_window2.show_page(test::left_page);
+        test_window3.show_page(test::right_page);
+
+        // Remember who to signal when the trial is over.
+        target = caller;
+    }
+}
