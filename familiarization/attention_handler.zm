@@ -75,11 +75,10 @@ State attention_handler
             start_light(FRONT_SIDE);
             front_page.show_animation(); // TODO background_stimulus is not the attention grabber
             
-            running = true;
             audio.play(event_time + 50ms);
 
             stop_light(FRONT_SIDE | RIGHT_SIDE | LEFT_SIDE);
-            start_light(FONT_SIDE);
+            start_light(FRONT_SIDE);
         }
 
         on_event:message()
@@ -134,7 +133,7 @@ State attention_handler
             device = sound_output_device;
 
             string giggle_fn = stimuli_dir() + "sounds/fam/" + "giggle.wav";
-            clip.file = giggle_fn
+            clip.file = giggle_fn;
 
             validate_sample_rate(clip);
 

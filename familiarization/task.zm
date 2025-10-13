@@ -25,6 +25,7 @@ import defs;
 import stimuli;
 import output;
 import fam_handler;
+import attention_handler;
 import std_blank_page;
 
 import eyetracker_infant;
