@@ -60,14 +60,6 @@ State attention_handler
         control.stop_light(mask);
     }
 
-    State attention_start
-    {
-        on_event:entry()
-        {
-            println("Start attention");
-        }
-    }
-
     State stimulus_presentation
     {
         on_event:entry()
@@ -83,13 +75,16 @@ State attention_handler
 
         on_event:message()
         {
+            if (message_sender == control) {
+                if (message_arg == RESPONSE_GO) {
+                    done(CONTINUE);
+                }
+            }
         }
     }
 
     SoundPlayback audio
     {
-        int nth_stimulus = 0;
-        string log_trial_name; 
 
         init()
         {
@@ -132,7 +127,7 @@ State attention_handler
 
             device = sound_output_device;
 
-            string giggle_fn = stimuli_dir() + "sounds/fam/" + "giggle.wav";
+            string giggle_fn = stimuli_dir() + "sounds/fam/" + "baby-giggle.wav";
             clip.file = giggle_fn;
 
             validate_sample_rate(clip);
@@ -172,7 +167,6 @@ State attention_handler
 
         control.reset_clock();
 
-
         // TODO // Check whether this is desired perhaps better in action...
         enter();
     }
@@ -190,7 +184,7 @@ State attention_handler
         leave();
     }
 
-    void action(Object caller, time tref, TestItem[] items)
+    void action(Object caller, time tref)
     {
         // Show pages representing the front and side lights on the appropriate
         // test windows.

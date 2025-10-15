@@ -132,6 +132,13 @@ Block task
                 num_cycles = NUM_FAM_BLOCKS;
             }
 
+            Trial attention {
+                on_event:entry() {
+                     attention_handler.setup();
+                     attention_handler.action(this, reference_time);
+                }
+            };
+
             // One trial is an attention grabber and 6 stimuli.
             // The fam_handler will handle this.
             Trial trial
