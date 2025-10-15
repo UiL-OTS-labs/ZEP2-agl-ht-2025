@@ -65,7 +65,7 @@ State attention_handler
         on_event:entry()
         {
             start_light(FRONT_SIDE);
-            front_page.show_animation(); // TODO background_stimulus is not the attention grabber
+            front_page.show_attention();
             
             audio.play(event_time + 50ms);
 
@@ -145,6 +145,9 @@ State attention_handler
         front_page.hide_animation();
         signal_target(msgid);   // tell caller we're done
         target = null;
+        
+        // stop ongoing giggle
+        audio.abort();
 
         control.clear_status();
     }
