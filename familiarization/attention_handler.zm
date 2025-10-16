@@ -124,7 +124,6 @@ State attention_handler
         {
             abort();
 
-
             device = sound_output_device;
 
             string giggle_fn = stimuli_dir() + "sounds/fam/" + "baby-giggle.wav";
@@ -142,7 +141,7 @@ State attention_handler
     // Signals the initiator of the trial that we're done.
     void done(int msgid)
     {
-        front_page.hide_animation();
+        front_page.hide_attention();
         signal_target(msgid);   // tell caller we're done
         target = null;
         
