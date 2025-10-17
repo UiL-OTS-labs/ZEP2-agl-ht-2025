@@ -25,17 +25,15 @@ import validate_sound_file;
 // Symbolic definition of responses/events.
 enum TestEvent {
     RESPONSE_GO,
-    RESPONSE_START_ATTENTION,
     RESPONSE_HALT,
     AUDIO_START,
     AUDIO_FINISH,
-    TRAINING_REPEAT,
 }
 
 
 State fam_handler
 {
-    TestItem    item;           // trial control parameters
+    TestItem[]  fam_items;      // A reference to 6 familiarization items
 
     Direction   lightpos;       // which side light is presented
 
@@ -43,6 +41,7 @@ State fam_handler
     int         rightsidecount;
 
     bool        running;        // set at first 'looking' for first trial
+    int         block_num;
 
 
     init()
@@ -50,9 +49,14 @@ State fam_handler
         lightpos = FRONT_SIDE;
     }
 
+    on_event:entry()
+    {
+        front_page.show_animation();
+    }
 
     on_event:exit()
     {
+        front_page.hide_animation();
         stop_light(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
         control.hide_speaker_icon(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
         control.erase_clock();
@@ -68,116 +72,48 @@ State fam_handler
         control.stop_light(mask);
     }
 
-    State idle
-    {
-        on_event:entry()
-        {
-            println("enter idle");
-            stop_light(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
-        }
-
-
-        on_event:message()
-        {
-            if (message_arg == RESPONSE_START_ATTENTION)
-                attention_resetting.enter();
-        }
-    }
-
-
-    State attention_resetting
-    {
-        on_event:entry()
-        {
-            println("enter attention resetting");
-            start_light(FRONT_SIDE);
-
-            front_page.show_animation();
-
-            // Only reset the clock at the first trial.
-            if (!running) control.begin_clock();
-        }
-
-
-        on_event:message()
-        {
-            if (message_arg == RESPONSE_GO)
-                stimulus_presentation.enter();
-        }
-    }
-
-
-    State stimulus_presentation
-    {
-        on_event:entry()
-        {
-            println("enter stimulus presentation");
-            lightpos = item.sound_direction;
-            
-            if (!running)
-            {
-                running = true;
-                audio.play(event_time + 50ms);
-                looking.enter();
-            }
-
-            stop_light(FRONT_SIDE | RIGHT_SIDE | LEFT_SIDE);
-            start_light(lightpos);
-        }
-
-        on_event:message()
-        {
-        }
-    }
-
-
     State looking
     {
         on_event:entry()
         {
-            println("enter looking");
             control.start_clock(event_time);
         }
 
-        on_event:exit()
+        on_event:message()
+        {
+            if (message_sender == control) {
+                if (message_arg == RESPONSE_HALT)
+                    not_looking.enter();
+            }
+            else if (message_arg == AUDIO_START)
+                control.release_clock(event_time);
+        }
+    }
+
+    State not_looking
+    {
+        on_event:entry()
         {
             control.stop_clock(event_time);
         }
 
         on_event:message()
         {
-            if (message_arg == RESPONSE_HALT)
-                not_looking.enter();
-            else if (message_arg == AUDIO_START)
-                control.release_clock(event_time);
-        }
-    }
-
-
-    State not_looking
-    {
-        on_event:entry()
-        {
-            println("enter not looking");
-            // Don't do anything yet.
-        }
-
-        on_event:exit()
-        {
-        }
-
-        on_event:message()
-        {
-            if (message_arg == RESPONSE_GO)
-                looking.enter();
-            else if (message_arg == AUDIO_START)
-                control.release_clock(event_time);
+            if (message_sender == control) {
+                if (message_arg == RESPONSE_GO)
+                    looking.enter();
+            }
+            if (message_sender == audio) {
+                if (message_arg == AUDIO_START)
+                    control.release_clock(event_time);
+            }
         }
     }
 
     SoundPlayback audio
     {
         int nth_stimulus = 0;
+        TestItem item; // The current item
         string log_trial_name; 
 
         init()
@@ -196,12 +132,8 @@ State fam_handler
             if (!have_flag("no-et")) {
                 eyetracker.add_message(EYE_DATA_STIMULUS_START, string(item.sndfn));
 
-                if (nth_stimulus < NUM_NOISE_ITEMS_USED) {
-                    log_trial_name = "noise_" + (nth_stimulus + 1);
-                }
-                else {
-                    log_trial_name = "familiarization_" + (nth_stimulus + 1 - NUM_NOISE_ITEMS_USED);
-                }
+                log_trial_name = "familiarization_" + nth_stimulus;
+
                 eyetracker.print_to_data_file("start_trial" + " " + log_trial_name);
                 eyetracker.print_to_data_file("start_phase" + " " + log_trial_name);
                 eyetracker.print_to_data_file("var stimulus " + item.sndfn);
@@ -236,10 +168,10 @@ State fam_handler
 
             nth_stimulus++;
 
-            if (nth_stimulus >= fam_items.size) // we're done
+            if (nth_stimulus >= fam_items.size) // We're done
                 done(CONTINUE);
             else
-                play(event_time + INTERSTIMULUS_INTERVAL);
+                play(event_time + ISI);
 
             fam_stim_output_append(out);
         }
@@ -261,7 +193,7 @@ State fam_handler
                 this.scaling[REAR_RIGHT] = sound_settings::PLAYBACK_SCALING_VOLUME;
         }
 
-        void play(time tstart)
+        void play(time start_time)
         {
             abort();
 
@@ -270,34 +202,27 @@ State fam_handler
             device = sound_output_device;
 
             clip.file = stimuli_dir() + "sounds/fam/" + item.sndfn + ".wav";
-            clip.selection_begin = 0s; //reset
-            clip.fade_in_duration = 0s; //reset
 
-            dur stim_dur = INTER_STIMULUS_ONSET_INTERVAL - INTERSTIMULUS_INTERVAL;
-
-            if (clip.file_duration > stim_dur) {
-                print_error(clip.file + " >= " + int(stim_dur));
-            }
-
-            dur silence_dur = stim_dur - clip.file_duration;
-
-            silence.duration = silence_dur;
+            // pad stimulus with silence
+            silence.duration = SILENCE_DUR;
 
             validate_sample_rate(clip);
 
-            control.set_status(
+            control.set_status (
+                "block: " + block_num + "  " +
                 "trial: " + (nth_stimulus + 1) + "  id: " + string(item.id) +
-                "  direction: " + item.sound_direction);
+                "  direction: " + item.sound_direction
+            );
 
             setup_channels();
-            start(tstart);
+            start(start_time);
         }
     }
 
     // Signals the initiator of the trial that we're done.
     void done(int msgid)
     {
-        front_page.hide_animation();
+        cleanup(event_time);
         signal_target(msgid);   // tell caller we're done
         target = null;
 
@@ -321,13 +246,11 @@ State fam_handler
         control.disable_buttons();
         control.disable_keys();
         control.enable_button(test::BUTTON_GO, RESPONSE_GO);
-        control.enable_button(test::BUTTON_ATTENTION, RESPONSE_START_ATTENTION);
         control.enable_button(test::BUTTON_HALT, RESPONSE_HALT);
         control.enable_key(KEY_Return, RESPONSE_GO);
         control.enable_key(KEY_Escape, RESPONSE_HALT);
 
         control.reset_clock();
-        enter();
     }
 
     // Performs cleaning up if necessary.
@@ -342,14 +265,19 @@ State fam_handler
         control.disable_keys();
         control.target = null;
 
+        audio.nth_stimulus = 0;
+
         leave();
     }
 
-    void action(Object caller, time tref)
+    void action(Object caller, time tref, TestItem[] items, int block_num)
     {
         if (!have_flag("no-et")) {
             eyetracker.start_tracking();
         }
+
+        fam_items = items;
+        this.block_num = block_num;
 
         // Show pages representing the front and side lights on the appropriate
         // test windows.
@@ -358,7 +286,9 @@ State fam_handler
         test_window3.show_page(test::right_page);
 
         // Update status line on control window. Cleared in done() above.
-
+        audio.play(tref + ISI);
+        
+        enter();
 
         // Remember who to signal when the trial is over.
         target = caller;
