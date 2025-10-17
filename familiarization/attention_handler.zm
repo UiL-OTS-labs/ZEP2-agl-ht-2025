@@ -149,6 +149,8 @@ State attention_handler
         audio.abort();
 
         control.clear_status();
+
+        cleanup(event_time);
     }
 
     //==========================================================================
@@ -168,9 +170,6 @@ State attention_handler
         control.enable_key(KEY_Escape, RESPONSE_HALT);
 
         control.reset_clock();
-
-        // TODO // Check whether this is desired perhaps better in action...
-        enter();
     }
 
     // Performs cleaning up if necessary.
@@ -196,5 +195,7 @@ State attention_handler
 
         // Remember who to signal when the trial is over.
         target = caller;
+
+        this.enter();
     }
 }

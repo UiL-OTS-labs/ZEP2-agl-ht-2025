@@ -41,6 +41,7 @@ State fam_handler
     int         rightsidecount;
 
     bool        running;        // set at first 'looking' for first trial
+    int         block_num;
 
 
     init()
@@ -48,9 +49,14 @@ State fam_handler
         lightpos = FRONT_SIDE;
     }
 
+    on_event:entry()
+    {
+        front_page.show_animation();
+    }
 
     on_event:exit()
     {
+        front_page.hide_animation();
         stop_light(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
         control.hide_speaker_icon(FRONT_SIDE | LEFT_SIDE | RIGHT_SIDE);
         control.erase_clock();
@@ -70,13 +76,7 @@ State fam_handler
     {
         on_event:entry()
         {
-            println("looking enter");
             control.start_clock(event_time);
-        }
-
-        on_event:exit()
-        {
-            control.stop_clock(event_time);
         }
 
         on_event:message()
@@ -94,12 +94,7 @@ State fam_handler
     {
         on_event:entry()
         {
-            println("enter not looking");
-            // Don't do anything yet.
-        }
-
-        on_event:exit()
-        {
+            control.stop_clock(event_time);
         }
 
         on_event:message()
@@ -214,6 +209,7 @@ State fam_handler
             validate_sample_rate(clip);
 
             control.set_status (
+                "block: " + block_num + "  " +
                 "trial: " + (nth_stimulus + 1) + "  id: " + string(item.id) +
                 "  direction: " + item.sound_direction
             );
@@ -226,7 +222,6 @@ State fam_handler
     // Signals the initiator of the trial that we're done.
     void done(int msgid)
     {
-        front_page.hide_animation();
         cleanup(event_time);
         signal_target(msgid);   // tell caller we're done
         target = null;
@@ -275,13 +270,14 @@ State fam_handler
         leave();
     }
 
-    void action(Object caller, time tref, TestItem[] items)
+    void action(Object caller, time tref, TestItem[] items, int block_num)
     {
         if (!have_flag("no-et")) {
             eyetracker.start_tracking();
         }
 
         fam_items = items;
+        this.block_num = block_num;
 
         // Show pages representing the front and side lights on the appropriate
         // test windows.

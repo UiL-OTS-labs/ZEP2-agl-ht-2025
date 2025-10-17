@@ -158,7 +158,11 @@ Block task
                     }
 
                     fam_handler.setup();
-                    fam_handler.action(this, reference_time, block_items);
+                    fam_handler.action(
+                            this,
+                            reference_time,
+                            block_items,
+                            training_blocks.cycle + 1);
 
                     if (!have_flag("no-et")) {
                         eyetracker.add_message(EYE_DATA_TRIAL_START,
