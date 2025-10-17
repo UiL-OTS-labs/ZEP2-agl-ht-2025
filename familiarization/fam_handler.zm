@@ -25,17 +25,15 @@ import validate_sound_file;
 // Symbolic definition of responses/events.
 enum TestEvent {
     RESPONSE_GO,
-    RESPONSE_START_ATTENTION,
     RESPONSE_HALT,
     AUDIO_START,
     AUDIO_FINISH,
-    TRAINING_REPEAT,
 }
 
 
 State fam_handler
 {
-    TestItem    item;           // trial control parameters
+    TestItem[]  fam_items;      // A reference to 6 familiarization items
 
     Direction   lightpos;       // which side light is presented
 
@@ -120,6 +118,7 @@ State fam_handler
     SoundPlayback audio
     {
         int nth_stimulus = 0;
+        TestItem item; // The current item
         string log_trial_name; 
 
         init()
@@ -228,6 +227,7 @@ State fam_handler
     void done(int msgid)
     {
         front_page.hide_animation();
+        cleanup(event_time);
         signal_target(msgid);   // tell caller we're done
         target = null;
 
@@ -251,7 +251,6 @@ State fam_handler
         control.disable_buttons();
         control.disable_keys();
         control.enable_button(test::BUTTON_GO, RESPONSE_GO);
-        control.enable_button(test::BUTTON_ATTENTION, RESPONSE_START_ATTENTION);
         control.enable_button(test::BUTTON_HALT, RESPONSE_HALT);
         control.enable_key(KEY_Return, RESPONSE_GO);
         control.enable_key(KEY_Escape, RESPONSE_HALT);
@@ -271,6 +270,8 @@ State fam_handler
         control.disable_keys();
         control.target = null;
 
+        audio.nth_stimulus = 0;
+
         leave();
     }
 
@@ -279,6 +280,8 @@ State fam_handler
         if (!have_flag("no-et")) {
             eyetracker.start_tracking();
         }
+
+        fam_items = items;
 
         // Show pages representing the front and side lights on the appropriate
         // test windows.

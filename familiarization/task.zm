@@ -174,8 +174,6 @@ Block task
 
                 on_event:exit()
                 {
-                    fam_handler.cleanup(event_time);
-
                     if (!have_flag("no-et")) {
                         eyetracker.add_message(EYE_DATA_TRIAL_END,
                             string(familiarization.cycle) + "," +
