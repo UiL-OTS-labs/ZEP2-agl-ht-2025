@@ -28,10 +28,12 @@ const dur       MAX_LOOKAWAY_DURATION           = 2000ms;
 const dur       MIN_EXPOSURE_DURATION           = MAX_LOOKAWAY_DURATION;
 
 // Duration of the interval between two subtrials.
-const dur       INTERSTIMULUS_INTERVAL          = 50ms;
+// A trials starts with 500 ms ISI
+// The there is a speech stimulus of +/- 1500 ms
+// And there will be a silence to pad the sound stimulus to INTER_STIMULUS_ONSET_INTERVAL.
+const dur       ISI                             = 500ms;
 
-// Duration between the start of two consecutive trials
-const dur       INTER_STIMULUS_ONSET_INTERVAL   = 4s;
+const dur       SILENCE_DUR                     = 1900ms;
 
-const int       NUM_NOISE_ITEMS_TOT             = 36;
-const int       NUM_NOISE_ITEMS_USED            = 9;
+// // Duration between the start of two consecutive trials
+// const dur       INTER_STIMULUS_ONSET_INTERVAL   = 4s;

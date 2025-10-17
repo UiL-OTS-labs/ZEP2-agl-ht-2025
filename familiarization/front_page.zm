@@ -162,7 +162,6 @@ Page front_page
         layout.start_bg();
     }
 
-
     void hide_animation()
     {
         layout.stop_bg();
