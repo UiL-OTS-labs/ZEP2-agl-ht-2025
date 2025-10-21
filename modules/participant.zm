@@ -43,8 +43,10 @@ string[] valid_language = {
 };
 
 string[] valid_test_order = {
-    "order_a",
-    "order_b"
+    "O1",
+    "O2",
+    "O3",
+    "O4",
 };
 
 

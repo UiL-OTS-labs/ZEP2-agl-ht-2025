@@ -79,34 +79,6 @@ FieldDefInit[] participant_attribute_defs =
     },
     {
         // Attribute id.
-        "prosody",
-
-        // Attribute type.
-        FIELD_TYPE_ENUM,
-
-        // Attribute description.
-        "Which kind of prosody: noprosody, functional or emphasized",
-
-        // Set if attribute may identify a person.
-        false,
-
-        // Set if attribute may contain sentitive information.
-        false,
-
-        // Set to exclude attribute from export.
-        false,
-
-        // Set to show attribute in zepman record list.
-        false,
-
-        // Set if attribute is required for experiment.
-        true,
-
-        // Not used.
-        "functional|noprosody|emphasized"
-    },
-    {
-        // Attribute id.
         "language", // short for stimulus language
 
         // Attribute type.
@@ -159,7 +131,7 @@ FieldDefInit[] participant_attribute_defs =
         true,
 
         // Not used.
-        "order_a|order_b"
+        "O1|O2|O3|O4"
     },
 }
 
