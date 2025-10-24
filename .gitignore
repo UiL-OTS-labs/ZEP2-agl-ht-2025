@@ -1,4 +1,6 @@
 
+stimuli.xlsx
+
 # output data related files
 ./*.csv
 db/

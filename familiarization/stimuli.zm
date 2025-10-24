@@ -38,14 +38,10 @@ const string L2_SYLLABLE_3B = "meu";
 
 string[] middle_items = {
     "boo",
-    "buu",
     "daa",
     "deu",
-    "duu",
     "geu",
     "gie",
-    "guu",
-    "noe",
     "rie",
     "saa",
     "seu",
@@ -53,8 +49,6 @@ string[] middle_items = {
     "taa",
     "teu",
     "too",
-    "peu",
-    "puu",
 };
 
 TestItem[] temp_fam_items = {}; // stimuli without noise.
