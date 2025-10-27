@@ -1,19 +1,12 @@
 
 import agl_records;
 
-string[] l1_familiar = {
+string[] l1_grammatical = {
     "baa_daa_meu",
     "baa_geu_meu",
     "soe_daa_goo",
     "soe_geu_goo",
 };
-
-string[] l1_new_grammatical = {
-    "baa_roo_meu",
-    "baa_tie_meu",
-    "soe_roo_goo",
-    "soe_tie_goo",
-}
 
 string[] l1_ungrammatical = {
     "meu_baa_daa",
@@ -22,61 +15,15 @@ string[] l1_ungrammatical = {
     "goo_soe_geu",
 }
 
-string[] l2_familiar = {
-    "baa_daa_goo",
-    "baa_geu_goo",
-    "soe_daa_meu",
-    "soe_geu_meu",
-}
-
-string[] l2_new_grammatical = {
-    "baa_roo_goo",
-    "baa_tie_goo",
-    "soe_roo_meu",
-    "soe_tie_meu",
-}
-
-string[] l2_ungrammatical = {
-    "daa_goo_baa",
-    "goo_baa_geu",
-    "meu_soe_daa",
-    "geu_meu_soe",
-}
+string [] l2_grammatical = l1_ungrammatical;
+string [] l2_ungrammatical = l1_grammatical;
 
 string[] familiar;
-string[] new_grammatical;
 string[] ungrammatical;
-
-int[] rand_vals = {};
-
-TestItem[] block1 = {
-    {},
-    {},
-    {}
-};
-
-TestItem[] block2 = {
-    {},
-    {},
-    {}
-};
-
-TestItem[] block3 = {
-    {},
-    {},
-    {}
-};
-
-TestItem[] block4 = {
-    {},
-    {},
-    {}
-};
 
 TestItem[] test_items = {};
 
-string array_pop_string(string[] items)
-{
+string array_pop_string(string[] items) {
     string ret = items[items.size-1];
     items.size = items.size - 1;
     return ret;
@@ -85,15 +32,6 @@ string array_pop_string(string[] items)
 void append_test_item(TestItem[] items, TestItem item) {
     items.size = items.size + 1;
     items[items.size - 1] = item;
-}
-
-void
-append_suffix(string[] items, string suffix) {
-    int i;
-    while (i < items.size) {
-        items[i] += "_" + suffix;
-        i++;
-    }
 }
 
 TestItem
@@ -110,18 +48,10 @@ create_test_item(LanguageType language, TestOrder order, int block) {
 }
 
 TestItem
-create_familiar(LanguageType language, TestOrder order, int block) {
+create_grammatical(LanguageType language, TestOrder order, int block) {
     TestItem item  = create_test_item(language, order, block);
     item.test_type = TT_FAMILIAR;
     item.sndfn     = array_pop_string(familiar);
-    return item;
-}
-
-TestItem
-create_new_grammatical(LanguageType language, TestOrder order, int block) {
-    TestItem item  = create_test_item(language, order, block);
-    item.test_type = TT_NEW_GRAMMATICAL;
-    item.sndfn     = array_pop_string(new_grammatical);
     return item;
 }
 
@@ -133,203 +63,24 @@ create_ungrammatical(LanguageType language, TestOrder order, int block) {
     return item;
 }
 
-
-void prepare_order_a(LanguageType language) {
-    int rand_val = random(2);
-
-    block1[0] = create_familiar(language, TEST_ORDER_A, 1);
-
-    if (rand_val == 0) {
-        block1[1] = create_new_grammatical(language, TEST_ORDER_A, 1);
-        block1[2] = create_ungrammatical(language, TEST_ORDER_A, 1);
-    }
-    else if (rand_val == 1) {
-        block1[1] = create_ungrammatical(language, TEST_ORDER_A, 1);
-        block1[2] = create_new_grammatical(language, TEST_ORDER_A, 1);
-    }
-    else {
-        print_error("Oops rand_value isn't 1, or 2\n");
-    }
-    
-    rand_val = random(2);
-    block2[0] = create_familiar(language, TEST_ORDER_A, 2);
-
-    if (rand_val == 0) {
-        block2[1] = create_new_grammatical(language, TEST_ORDER_A, 2);
-        block2[2] = create_ungrammatical(language, TEST_ORDER_A, 2);
-    }
-    else if (rand_val == 1) {
-        block2[1] = create_ungrammatical(language, TEST_ORDER_A, 2);
-        block2[2] = create_new_grammatical(language, TEST_ORDER_A, 2);
-    }
-    else {
-        print_error("Oops rand_value isn't 1, or 2\n");
-    }
-    
-    rand_val = random(2);
-    block3[0] = create_ungrammatical(language, TEST_ORDER_A, 3);
-
-    if (rand_val == 0) {
-        block3[1] = create_new_grammatical(language, TEST_ORDER_A, 3);
-        block3[2] = create_familiar(language, TEST_ORDER_A, 3);
-    }
-    else if (rand_val == 1) {
-        block3[1] = create_familiar(language, TEST_ORDER_A, 3);
-        block3[2] = create_new_grammatical(language, TEST_ORDER_A, 3);
-    }
-    else {
-        print_error("Oops rand_value isn't 1, or 2\n");
-    }
-    
-    rand_val = random(2);
-    block4[0] = create_ungrammatical(language, TEST_ORDER_A, 4);
-
-    if (rand_val == 0) {
-        block4[1] = create_new_grammatical(language, TEST_ORDER_A, 4);
-        block4[2] = create_familiar(language, TEST_ORDER_A, 4);
-    }
-    else if (rand_val == 1) {
-        block4[1] = create_familiar(language, TEST_ORDER_A, 4);
-        block4[2] = create_new_grammatical(language, TEST_ORDER_A, 4);
-    }
-    else {
-        print_error("Oops rand_value isn't 1, or 2\n");
-    }
-}
-
-void prepare_order_b(LanguageType language) {
-    int rand_val = random(2);
-
-    block1[0] = create_ungrammatical(language, TEST_ORDER_B, 1);
-
-    if (rand_val == 0) {
-        block1[1] = create_new_grammatical(language, TEST_ORDER_B, 1);
-        block1[2] = create_familiar(language, TEST_ORDER_B, 1);
-    }
-    else if (rand_val == 1) {
-        block1[1] = create_familiar(language, TEST_ORDER_B, 1);
-        block1[2] = create_new_grammatical(language, TEST_ORDER_B, 1);
-    }
-    else {
-        print_error("Oops rand_value isn't 1, or 2\n");
-    }
-    
-    rand_val = random(2);
-    block2[0] = create_ungrammatical(language, TEST_ORDER_B, 2);
-
-    if (rand_val == 0) {
-        block2[1] = create_new_grammatical(language, TEST_ORDER_B, 2);
-        block2[2] = create_familiar(language, TEST_ORDER_B, 2);
-    }
-    else if (rand_val == 1) {
-        block2[1] = create_familiar(language, TEST_ORDER_B, 2);
-        block2[2] = create_new_grammatical(language, TEST_ORDER_B, 2);
-    }
-    else {
-        print_error("Oops rand_value isn't 1, or 2\n");
-    }
-    
-    rand_val = random(2);
-    block3[0] = create_familiar(language, TEST_ORDER_B, 3);
-
-    if (rand_val == 0) {
-        block3[1] = create_new_grammatical(language, TEST_ORDER_B, 3);
-        block3[2] = create_ungrammatical(language, TEST_ORDER_B, 3);
-    }
-    else if (rand_val == 1) {
-        block3[1] = create_ungrammatical(language, TEST_ORDER_B, 3);
-        block3[2] = create_new_grammatical(language, TEST_ORDER_B, 3);
-    }
-    else {
-        print_error("Oops rand_value isn't 1, or 2\n");
-    }
-    
-    rand_val = random(2);
-    block4[0] = create_familiar(language, TEST_ORDER_B, 4);
-
-    if (rand_val == 0) {
-        block4[1] = create_new_grammatical(language, TEST_ORDER_B, 4);
-        block4[2] = create_ungrammatical(language, TEST_ORDER_B, 4);
-    }
-    else if (rand_val == 1) {
-        block4[1] = create_ungrammatical(language, TEST_ORDER_B, 4);
-        block4[2] = create_new_grammatical(language, TEST_ORDER_B, 4);
-    }
-    else {
-        print_error("Oops rand_value isn't 1, or 2\n");
-    }
-}
-
-void prepare_test_items() {
-
-    string sorder = expdb.participant.get_enum_field("testorder");
-    string slang = expdb.participant.get_enum_field("language");
-    LanguageType language = slang == "l1" ? L1 : L2;
-
-    if (sorder == "order_a") {
-        prepare_order_a(language);
-    }
-    else if (sorder == "order_b") {
-        prepare_order_b(language);
-    }
-    else {
-        print_error("ERROR: Unexpected test order: " + sorder + "\n");
-    }
-
-    // lump blocks together in test_items.
-    int i = 0;
-    while (i < block1.size) {
-        append_test_item(test_items, block1[i]);
-        i++;
-    }
-
-    i = 0;
-    while (i < block2.size) {
-        append_test_item(test_items, block2[i]);
-        i++;
-    }
-    
-    i = 0;
-    while (i < block3.size) {
-        append_test_item(test_items, block3[i]);
-        i++;
-    }
-    
-    i = 0;
-    while (i < block4.size) {
-        append_test_item(test_items, block4[i]);
-        i++;
-    }
-}
-
 void
 prepare_stimuli_lists() {
     string slt = expdb.participant.get_enum_field("language");
 
-    ProsodyType prosody;
-    string sprosody = expdb.participant.get_enum_field("prosody");
-
     if (slt == "l1") {
-        familiar = l1_familiar;
-        new_grammatical = l1_new_grammatical;
+        grammatical = l1_grammatical;
         ungrammatical = l1_ungrammatical;
     }
     else if (slt == "l2") {
-        familiar = l2_familiar;
-        new_grammatical = l2_new_grammatical;
+        grammatical = l2_grammatical;
         ungrammatical = l2_ungrammatical;
     }
     else {
         print_error("Oops, language seems invalid");
     }
 
-    familiar.shuffle(0,-1);
-    new_grammatical.shuffle(0,-1);
+    grammatical.shuffle(0,-1);
     ungrammatical.shuffle(0,-1);
-
-    append_suffix(familiar, sprosody);
-    append_suffix(new_grammatical, sprosody);
-    append_suffix(ungrammatical, sprosody);
 }
 
 void
