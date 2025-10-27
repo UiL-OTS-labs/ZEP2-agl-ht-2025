@@ -18,7 +18,6 @@ int create_participant_fields()
 {
     expdb.participant.add_field("gender");
     expdb.participant.add_field("birthdate");
-    expdb.participant.add_field("prosody");
     expdb.participant.add_field("language");
     expdb.participant.add_field("testorder");
 
@@ -29,12 +28,6 @@ string[] valid_gender = {
     "male",
     "female",
     "other"
-};
-
-string[] valid_prosody = {
-    "functional",
-    "emphasized",
-    "noprosody",
 };
 
 string[] valid_language = {
@@ -98,16 +91,6 @@ int check_participant_fields()
     );
     if (status != OK)
         return status;
-
-    string prosody = expdb.participant.get_enum_field("prosody");
-    status = check_enum_field_in_array(
-        valid_prosody,
-        prosody,
-        "prosody"
-    );
-    if (status != OK)
-        return status;
-
 
     string language = expdb.participant.get_enum_field("language");
     status = check_enum_field_in_array(
