@@ -32,9 +32,6 @@ import eyetracker_infant;
 import et_setup_page;
 import fam_constants;
 
-// Familiarization item table.
-TestItem[..] fam_items;
-
 Block task
 {
 
@@ -143,19 +140,11 @@ Block task
             // The fam_handler will handle this.
             Trial trial
             {
-                TestItem[] block_items = {};
+                TestItem[] block_items;
 
                 on_event:entry()
                 {
-                    block_items.size = NUM_STIMULI_PER_BLOCK;
-                    int start  = training_blocks.cycle * NUM_STIMULI_PER_BLOCK;
-
-                    // Populate the current block items.
-                    int i = 0;
-                    while (i < NUM_STIMULI_PER_BLOCK) {
-                        block_items[i] = fam_items[start + i];
-                        i++;
-                    }
+                    block_items = fam_items[training_blocks.cycle];
 
                     fam_handler.setup();
                     fam_handler.action(
