@@ -19,8 +19,7 @@ enum ProsodyType
 
 enum TestType {
     TT_TRAINING,
-    TT_FAMILIAR,
-    TT_NEW_GRAMMATICAL,
+    TT_GRAMMATICAL,
     TT_UNGRAMMATICAL
 }
 
