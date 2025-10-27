@@ -7,7 +7,7 @@ enum LanguageType
 {
     L1, // Stimulus from language 1
     L2, // from language 2.
-    NOISE, // It's not a language but noise
+    ODD, // It's an ODDBALL in fam phase
 }
 
 enum ProsodyType

@@ -201,7 +201,7 @@ State fam_handler
 
             device = sound_output_device;
 
-            clip.file = stimuli_dir() + "sounds/fam/" + item.sndfn + ".wav";
+            clip.file = stimuli_dir() + "sounds/" + item.sndfn + ".wav";
 
             // pad stimulus with silence
             silence.duration = SILENCE_DUR;

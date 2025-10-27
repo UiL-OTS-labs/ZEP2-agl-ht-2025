@@ -51,7 +51,42 @@ string[] middle_items = {
     "too",
 };
 
-TestItem[] temp_fam_items = {}; // stimuli without noise.
+string[] odds_l1 = {
+    "baa_meu_saa_odd",
+    "baa_meu_deu_odd",
+    "soe_goo_rie_odd",
+    "soe_goo_suu_odd",
+    "gie_baa_meu_odd",
+    "teu_baa_meu_odd",
+    "boo_soe_goo_odd",
+    "taa_soe_goo_odd"
+}
+
+string[] odds_l2 = {
+    "baa_goo_saa_odd",
+    "baa_goo_deu_odd",
+    "soe_meu_rie_odd",
+    "soe_meu_suu_odd",
+    "gie_baa_goo_odd",
+    "teu_baa_goo_odd",
+    "boo_soe_meu_odd",
+    "taa_soe_meu_odd"
+}
+
+string[] odds;
+
+TestItem[] temp_fam_items = {};
+
+TestItem[][] fam_items = {
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {}
+}
 
 void append_test_item(TestItem[] items, TestItem item)
 {
@@ -59,57 +94,181 @@ void append_test_item(TestItem[] items, TestItem item)
     items[items.size - 1] = item;
 }
 
+void swap_test_items(TestItem[] items, int first, int second)
+{
+    TestItem temp = items[first];
+    items[first] = items[second];
+    items[second] = temp;
+}
+
 void
-append_fam_items(TestItem[] items, string prefix, string postfix, LanguageType lt, string prosody) {
-    
+append_fam_items(TestItem[] items, string first_part, string third_part, LanguageType lt)
+{
     int i = 0;
     while (i < middle_items.size) {
         TestItem item;
         item.id = items.size + 1;
-        item.sndfn = prefix + "_" + middle_items[i] + "_" + postfix + "_" + prosody;
+        item.sndfn = first_part + "_" + middle_items[i] + "_" + third_part;
         item.language = lt;
         item.sound_direction = FRONT_SIDE;
 
         append_test_item(items, item);
+        i++;
+    }
+}
+
+// Appends an odd item to the end of the block and swaps it with an inner item (not
+// first nor last). Makes sure odd are not presented subsequently.
+void insert_fam_odds() {
+    int i = 0;
+    while (i < fam_items.size) {
+        TestItem odd_item;
+        odd_item.id = -i;
+        odd_item.sndfn = odds[i];
+        odd_item.language = ODD;
+        odd_item.sound_direction = FRONT_SIDE;
+        
+        // Append odd ball to the end.
+        append_test_item(fam_items[i], odd_item);
+
+        // swap the last item with one in the middle
+        int r = random(1, fam_items[i].size - 2);
+        swap_test_items(fam_items[i],
+                        fam_items[i].size - 1,
+                        r);
 
         i++;
     }
 }
 
-// Computes the name of the stimuli.
-int compute_fam_stimuli ()
-{
+void
+create_temp_fam_items() {
     LanguageType lt;
     string slt = expdb.participant.get_enum_field("language");
     lt = slt == "l1" ? L1 : L2;
-    
-    ProsodyType prosody;
-    string sprosopdy = expdb.participant.get_enum_field("prosody");
 
+    temp_fam_items.size = 0; // clear the array
+    
     if (lt == L1) {
-        // first 36
-        append_fam_items(temp_fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
-        append_fam_items(temp_fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
-        // second 36
-        append_fam_items(temp_fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt, sprosopdy);
-        append_fam_items(temp_fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt, sprosopdy);
+        // first 24
+        append_fam_items(temp_fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt);
+        append_fam_items(temp_fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt);
+        // second 24
+        append_fam_items(temp_fam_items, L1_SYLLABLE_1A, L1_SYLLABLE_3A, lt);
+        append_fam_items(temp_fam_items, L1_SYLLABLE_1B, L1_SYLLABLE_3B, lt);
     }
     else { // 2nd and 3rd argument are different
-        // first 36
-        append_fam_items(temp_fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
-        append_fam_items(temp_fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
-        // second 36
-        append_fam_items(temp_fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt, sprosopdy);
-        append_fam_items(temp_fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt, sprosopdy);
+        // first 24
+        append_fam_items(temp_fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt);
+        append_fam_items(temp_fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt);
+        // second 24
+        append_fam_items(temp_fam_items, L2_SYLLABLE_1A, L2_SYLLABLE_3A, lt);
+        append_fam_items(temp_fam_items, L2_SYLLABLE_1B, L2_SYLLABLE_3B, lt);
     }
 
     temp_fam_items.shuffle(0, temp_fam_items.size/2); // shuffle first half
     temp_fam_items.shuffle(temp_fam_items.size/2, -1); // shuffle second half
+}
+
+// No two stimuli in a row contain the same items
+bool check_no_stimulus_repetitions(TestItem[] items)
+{
+    int i = 1;
+    while (i < items.size) {
+        if (items[i] == items[i-1]) {
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+bool check_one_odd_per_block() {
+    int i = 0;
+    while (i < fam_items.size) {
+        int j = 0;
+        int num_odd = 0;
+
+        while(j < fam_items[i].size) {
+            if (find_key(fam_items[i][j].sndfn, "odd") >= 0)
+                num_odd++;
+            j++;
+        }
+
+        if (num_odd != 1) {
+            return false;
+        }
+
+        i++;
+    }
+
+    return true;
+}
+
+bool check_odd_not_at_the_start_or_end() {
+    int i = 0;
+
+    while (i < fam_items.size) {
+        // first
+        if (find_key(fam_items[i][0].sndfn, "odd") >= 0)
+            return false;
+        // last
+        if (find_key(fam_items[i][fam_items[i].size - 1].sndfn, "odd") >= 0)
+            return false;
+
+        i++;
+    }
+
+    return true;
+}
+
+bool check_fam_stim_rules() {
+    TestItem[] linearized = {};
+    int i = 0;
+
+    while (i < fam_items.size) {
+        int j = 0;
+        while (j < fam_items[i].size) {
+            append_test_item(linearized, fam_items[i][j]);
+            j++;
+        }
+        i++;
+    }
+
+    // 6 stims + one "odd ball" per block
+    if (linearized.size != (NUM_STIMULI_PER_BLOCK + 1) * NUM_FAM_BLOCKS)
+        return false;
+
+    if (!check_no_stimulus_repetitions(linearized)) {
+        return false;
+    }
+
+    if (!check_one_odd_per_block())
+        return false;
+    
+    if (!check_odd_not_at_the_start_or_end())
+        return false;
+    
+    return true;
+}
+
+// Computes the names of the stimuli, does this twice and appends them to the
+// temp fam items.
+int compute_fam_stimuli ()
+{
+    while (!check_fam_stim_rules()) {
+        create_temp_fam_items();
+        create_final_fam_list_no_odds();
+        if (!check_no_stimulus_repetitions(temp_fam_items))
+            continue;
+
+        insert_fam_odds();
+    }
 
     return OK;
 }
 
-int check_stimuli_list(TestItem[] stimuli_list)
+int check_stim_files_present(TestItem[] stimuli_list)
 {
     // List is not supposed to be empty
     if(stimuli_list.size == 0)
@@ -121,7 +280,11 @@ int check_stimuli_list(TestItem[] stimuli_list)
     int index = 0;
     while( index < stimuli_list.size )
     {
-        string full_filename = stimuli_dir() + "sounds/fam/" + stimuli_list[index].sndfn + ".wav";
+        string full_filename = stimuli_dir()
+            + "sounds/fam/"
+            + stimuli_list[index].sndfn
+            + ".wav";
+
         if( !file_readable(full_filename) )
         {
             print_error("\"" + full_filename +"\" isn't found");
@@ -138,26 +301,56 @@ int check_stimuli_list(TestItem[] stimuli_list)
 }
 
 void
-create_final_fam_list() {
+create_final_fam_list_no_odds() {
     int i = 0;
+    // clear in case of retry;
+    fam_items.size = 0;
+    fam_items.size = NUM_FAM_BLOCKS;
 
-    while (i < temp_fam_items.size) {
-        append_test_item(fam_items, temp_fam_items[i]);
+    while (i < NUM_FAM_BLOCKS) {
+        int j = 0;
+        while(j < NUM_STIMULI_PER_BLOCK) {
+            append_test_item(
+                    fam_items[i],
+                    temp_fam_items[i * NUM_STIMULI_PER_BLOCK + j]
+                    );
+            j++;
+        }
         i++;
     }
 }
 
 int load_stimuli() {
+    LanguageType lt;
+    string slt = expdb.participant.get_enum_field("language");
+    lt = slt == "l1" ? L1 : L2;
+
+    if (lt == L1)
+        odds = odds_l1;
+    else
+        odds = odds_l2;
+
+    odds.shuffle(0, -1);
+
     int status = compute_fam_stimuli();
     if (status != OK)
         return status;
 
-    create_final_fam_list();
-    
     if (have_flag("print-items") || have_flag("print-fam-items")) {
-        print_test_items(fam_items);
+        TestItem[] temp = {};
+        int i = 0;
+        while (i < fam_items.size) {
+            int j = 0;
+            while (j < fam_items[i].size) {
+                append_test_item(temp, fam_items[i][j]);
+                j++;
+            }
+
+            i++;
+        }
+        print_test_items(temp);
     }
 
-    return check_stimuli_list(fam_items);
+    return status;
 }
 
