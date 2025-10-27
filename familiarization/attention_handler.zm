@@ -126,7 +126,7 @@ State attention_handler
 
             device = sound_output_device;
 
-            string giggle_fn = stimuli_dir() + "sounds/fam/" + "baby-giggle.wav";
+            string giggle_fn = stimuli_dir() + "sounds/" + "baby-giggle.wav";
             clip.file = giggle_fn;
 
             validate_sample_rate(clip);

@@ -133,7 +133,6 @@ void insert_fam_odds() {
 
         // swap the last item with one in the middle
         int r = random(1, fam_items[i].size - 2);
-        println("r = " + r);
         swap_test_items(fam_items[i],
                         fam_items[i].size - 1,
                         r);
@@ -266,8 +265,6 @@ int compute_fam_stimuli ()
         insert_fam_odds();
     }
 
-    println("Stimuli are computed");
-
     return OK;
 }
 
@@ -340,7 +337,6 @@ int load_stimuli() {
         return status;
 
     if (have_flag("print-items") || have_flag("print-fam-items")) {
-        println("Printing test items");
         TestItem[] temp = {};
         int i = 0;
         while (i < fam_items.size) {
