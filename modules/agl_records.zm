@@ -30,7 +30,6 @@ record TestItem
     int                             id;                 // item trial_num
     LanguageType                    language;           // item type
     TestType                        test_type;          // Type of item
-    int                             test_block;         // which test block
     string                          sndfn;              // stimulus sound file
     std_baby_control::Direction     sound_direction;    // direction the sounds come from
 }
@@ -39,7 +38,8 @@ void print_test_item(TestItem item) {
     println("" + item.id + "\t"
                + item.language + "\t"
                + item.sndfn + "\t"
-               + item.sound_direction
+               + item.sound_direction + "\t"
+               + item.test_type
     );
 }
 

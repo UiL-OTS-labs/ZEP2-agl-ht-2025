@@ -32,11 +32,9 @@ int find_string_index(string[] haystack, string needle) {
 LanguageType determine_language(string stimulus) {
     LanguageType ret = LANGUAGE_NOT_SPECIFIED;
     if (find_string_index(l1_stimuli, stimulus) != -1) {
-        println("stimulus = " + stimulus + " = " + L1);
         return L1;
     }
     else if (find_string_index(l2_stimuli, stimulus) != -1) {
-        println("stimulus = " + stimulus + " = " + L1);
         return L2;
     }
     else {
