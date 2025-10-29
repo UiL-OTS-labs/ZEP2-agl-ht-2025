@@ -1,5 +1,47 @@
 
 import agl_records;
+import defs;
+
+string[] l1_stimuli = {
+    "baa_daa_meu",
+    "baa_geu_meu",
+    "soe_daa_goo",
+    "soe_geu_goo"
+};
+
+string[] l2_stimuli = {
+    "baa_daa_goo",
+    "baa_geu_goo",
+    "soe_daa_meu",
+    "soe_geu_meu"
+};
+
+int find_string_index(string[] haystack, string needle) {
+    int i;
+    int ret = -1;
+
+    while (i < haystack.size) {
+        if (haystack[i] == needle)
+            return i;
+    }
+
+    return ret;
+}
+
+LanguageType determine_language(string stimulus) {
+    LanguageType ret = LANGUAGE_NOT_SPECIFIED;
+    if (find_string_index(l1_stimuli, stimulus)) {
+        return L1;
+    }
+    else if (find_string_index(l2_stimuli, stimulus)) {
+        return L2;
+    }
+    else {
+        print_error("Oops stimulus: '" + stimulus + "', is neither L1 or L2\n");
+        flush_error();
+    }
+    return ret;
+}
 
 string[] l1_grammatical = {
     "baa_daa_meu",
@@ -15,10 +57,13 @@ string[] l1_ungrammatical = {
     "goo_soe_geu",
 }
 
-string [] l2_grammatical = l1_ungrammatical;
-string [] l2_ungrammatical = l1_grammatical;
+// What is grammatical in l1 is ungrammatical in l2 and vice versa
+string[] l2_grammatical;
+string[] l2_ungrammatical;
 
-string[] familiar;
+// Based on the chosen language, store (un)grammatical stimuli names here.
+// References are initialized in load_stimuli();
+string[] grammatical;
 string[] ungrammatical;
 
 TestItem[] test_items = {};
@@ -35,37 +80,58 @@ void append_test_item(TestItem[] items, TestItem item) {
 }
 
 TestItem
-create_test_item(LanguageType language, TestOrder order, int block) {
+pop_test_item(TestItem[] items)
+{
+    TestItem ret = items[items.size - 1];
+    items.size = items.size - 1;
+    return ret;
+}
+
+TestItem
+create_test_item(LanguageType language) {
 
     TestItem init;
     init.id = -1;
     init.language = language;
-    init.order = order;
-    init.test_block = block;
     init.sound_direction = PSEUDO_RANDOM_SIDE;
 
     return init; 
 }
 
 TestItem
-create_grammatical(LanguageType language, TestOrder order, int block) {
-    TestItem item  = create_test_item(language, order, block);
-    item.test_type = TT_FAMILIAR;
-    item.sndfn     = array_pop_string(familiar);
+create_grammatical() {
+
+    string stimulus = array_pop_string(grammatical);
+
+    LanguageType language = determine_language(stimulus);
+
+    TestItem item  = create_test_item(language);
+    item.test_type = TT_GRAMMATICAL;
+    item.sndfn     = stimulus;
+
     return item;
 }
 
 TestItem
-create_ungrammatical(LanguageType language, TestOrder order, int block) {
-    TestItem item  = create_test_item(language, order, block);
+create_ungrammatical() {
+
+    string stimulus;
+
+    LanguageType language = determine_language(stimulus);
+
+    TestItem item  = create_test_item(language);
     item.test_type = TT_UNGRAMMATICAL;
     item.sndfn     = array_pop_string(ungrammatical);
+
     return item;
 }
 
+// Selects the right list of grammatical and ungrammatical stimuli for language
+// L1 or L2.
+// And shuffles the grammatical and ungrammatical items.
 void
 prepare_stimuli_lists() {
-    string slt = expdb.participant.get_enum_field("language");
+    string slt = to_lowercase(expdb.participant.get_enum_field("language"));
 
     if (slt == "l1") {
         grammatical = l1_grammatical;
@@ -86,22 +152,72 @@ prepare_stimuli_lists() {
 void
 set_stimulus_direction() {
     int i;
-    rand_vals.size = test_items.size;
 
-    // assign 1 to lower half of rand items
-    while (i < rand_vals.size/2) {
-        rand_vals[i] = 1;
-        i++;
-    }
-    rand_vals.shuffle(0, -1);
+    println("Set on basis of participant characteristics.");
+
+    string first = expdb.participant.get_string_field("first");
+    first = "left"; // TODO remove and implement expdb.participant.first field
 
     i = 0;
     while (i < test_items.size) {
-        if (rand_vals[i] == 0)
+        if (i % 2 == 0 && first == "left") {
             test_items[i].sound_direction = LEFT_SIDE;
-        else
+        }
+        else if(i % 2 == 1 && first == "left") {
             test_items[i].sound_direction = RIGHT_SIDE;
+        }
+        else if (i % 2 == 0 && first == "right") {
+            test_items[i].sound_direction = RIGHT_SIDE;
+        }
+        else if(i % 2 == 1 && first == "right") {
+            test_items[i].sound_direction = LEFT_SIDE;
+        }
+        else {
+            print_error("Oops unexpected combination of parameters, this is a bug.");
+        }
+
         i++;
+    }
+}
+
+void
+prepare_test_items() {
+    int i = 0;
+    string GRAMMATICAL = "grammatical";
+    string UNGRAMMATICAL = "ungrammatical";
+
+    string grammar_first = expdb.participant.get_enum_field("first_grammar");
+
+    while (i < 0) {
+        bool is_even = i % 2 == 0;
+        bool is_odd = i % 2 == 1;
+
+        TestItem item;
+
+        if (is_even && grammar_first == GRAMMATICAL) {
+            item = create_grammatical();
+        }
+        else if(is_odd && grammar_first == GRAMMATICAL) {
+            item = create_ungrammatical();
+        }
+        else if(is_even && grammar_first == UNGRAMMATICAL) {
+            item = create_ungrammatical();
+        }
+        else if(is_odd && grammar_first == UNGRAMMATICAL) {
+            item = create_grammatical();
+        }
+        else{
+            print_error(
+                "Oops unexpected parameters for choosing stimuli based on grammar\n"
+            );
+        }
+
+
+        append_test_item(test_items, item);
+        i++;
+    }
+    if (test_items.size != NUM_TEST_TRIALS) {
+        print_error("Oops expected to have precisely 8 test_items here.");
     }
 }
 
@@ -115,6 +231,10 @@ set_trial_numbers() {
 }
 
 int load_stimuli() {
+
+    // initialize l2 grammars from l1.
+    l2_ungrammatical = l1_grammatical;
+    l2_grammatical = l1_ungrammatical;
 
     prepare_stimuli_lists();
     prepare_test_items();
