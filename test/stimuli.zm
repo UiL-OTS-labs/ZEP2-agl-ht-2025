@@ -155,27 +155,19 @@ set_stimulus_direction() {
 
     println("Set on basis of participant characteristics.");
 
-    string first = expdb.participant.get_string_field("first");
-    first = "left"; // TODO remove and implement expdb.participant.first field
+    string first = expdb.participant.get_enum_field("first_side");
+
+    if (first != "left" && first != "right") {
+        print_error("oops first_sided ain'n left nor right...\n");
+        flush_error();
+    }
+
+    Direction next_side = first == "left" ? LEFT_SIDE : RIGHT_SIDE;
 
     i = 0;
     while (i < test_items.size) {
-        if (i % 2 == 0 && first == "left") {
-            test_items[i].sound_direction = LEFT_SIDE;
-        }
-        else if(i % 2 == 1 && first == "left") {
-            test_items[i].sound_direction = RIGHT_SIDE;
-        }
-        else if (i % 2 == 0 && first == "right") {
-            test_items[i].sound_direction = RIGHT_SIDE;
-        }
-        else if(i % 2 == 1 && first == "right") {
-            test_items[i].sound_direction = LEFT_SIDE;
-        }
-        else {
-            print_error("Oops unexpected combination of parameters, this is a bug.");
-        }
-
+        test_items[i].sound_direction = next_side;
+        next_side = next_side == LEFT_SIDE ? RIGHT_SIDE : LEFT_SIDE;
         i++;
     }
 }
@@ -211,7 +203,6 @@ prepare_test_items() {
                 "Oops unexpected parameters for choosing stimuli based on grammar\n"
             );
         }
-
 
         append_test_item(test_items, item);
         i++;

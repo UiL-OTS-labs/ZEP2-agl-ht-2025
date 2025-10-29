@@ -105,34 +105,6 @@ FieldDefInit[] participant_attribute_defs =
         // Enumerator list.
         "l1|l2"
     },
-//    {
-//        // Attribute id.
-//        "testorder",
-//
-//        // Attribute type.
-//        FIELD_TYPE_ENUM,
-//
-//        // Attribute description.
-//        "The test order for the test stimuli",
-//
-//        // Set if attribute may identify a person.
-//        false,
-//
-//        // Set if attribute may contain sensitive information.
-//        false,
-//
-//        // Set to exclude attribute from export.
-//        false,
-//
-//        // Set to show attribute in zepman record list.
-//        false,
-//
-//        // Set if attribute is required for experiment.
-//        true,
-//
-//        // Not used.
-//        "O1|O2|O3|O4"
-//    },
     {
         // Attribute id.
         "first_grammar",
@@ -161,6 +133,35 @@ FieldDefInit[] participant_attribute_defs =
         // Not used.
         "grammatical|ungrammatical"
     },
+    {
+        // Attribute id.
+        "first_side",
+
+        // Attribute type.
+        FIELD_TYPE_ENUM,
+
+        // Attribute description.
+        "The string that selects the first side of the test stimuli",
+
+        // Set if attribute may identify a person.
+        false,
+
+        // Set if attribute may contain sensitive information.
+        false,
+
+        // Set to exclude attribute from export.
+        false,
+
+        // Set to show attribute in zepman record list.
+        false,
+
+        // Set if attribute is required for experiment.
+        true,
+
+        // Not used.
+        "left|right"
+    },
+
 }
 
 
