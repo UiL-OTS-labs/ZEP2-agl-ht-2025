@@ -23,6 +23,7 @@ int find_string_index(string[] haystack, string needle) {
     while (i < haystack.size) {
         if (haystack[i] == needle)
             return i;
+        i++;
     }
 
     return ret;
@@ -30,10 +31,12 @@ int find_string_index(string[] haystack, string needle) {
 
 LanguageType determine_language(string stimulus) {
     LanguageType ret = LANGUAGE_NOT_SPECIFIED;
-    if (find_string_index(l1_stimuli, stimulus)) {
+    if (find_string_index(l1_stimuli, stimulus) != -1) {
+        println("stimulus = " + stimulus + " = " + L1);
         return L1;
     }
-    else if (find_string_index(l2_stimuli, stimulus)) {
+    else if (find_string_index(l2_stimuli, stimulus) != -1) {
+        println("stimulus = " + stimulus + " = " + L1);
         return L2;
     }
     else {
@@ -51,10 +54,10 @@ string[] l1_grammatical = {
 };
 
 string[] l1_ungrammatical = {
-    "meu_baa_daa",
-    "geu_meu_baa",
-    "daa_goo_soe",
-    "goo_soe_geu",
+    "baa_daa_goo",
+    "baa_geu_goo",
+    "soe_daa_meu",
+    "soe_geu_meu"
 }
 
 // What is grammatical in l1 is ungrammatical in l2 and vice versa
@@ -88,26 +91,17 @@ pop_test_item(TestItem[] items)
 }
 
 TestItem
-create_test_item(LanguageType language) {
-
-    TestItem init;
-    init.id = -1;
-    init.language = language;
-    init.sound_direction = PSEUDO_RANDOM_SIDE;
-
-    return init; 
-}
-
-TestItem
 create_grammatical() {
 
     string stimulus = array_pop_string(grammatical);
 
     LanguageType language = determine_language(stimulus);
 
-    TestItem item  = create_test_item(language);
+    TestItem item;
     item.test_type = TT_GRAMMATICAL;
     item.sndfn     = stimulus;
+    item.language  = language;
+    item.id        = -1;
 
     return item;
 }
@@ -115,13 +109,15 @@ create_grammatical() {
 TestItem
 create_ungrammatical() {
 
-    string stimulus;
+    string stimulus = array_pop_string(ungrammatical);
 
     LanguageType language = determine_language(stimulus);
 
-    TestItem item  = create_test_item(language);
+    TestItem item;
     item.test_type = TT_UNGRAMMATICAL;
-    item.sndfn     = array_pop_string(ungrammatical);
+    item.sndfn     = stimulus;
+    item.language  = language;
+    item.id        = -1;
 
     return item;
 }
@@ -152,9 +148,6 @@ prepare_stimuli_lists() {
 void
 set_stimulus_direction() {
     int i;
-
-    println("Set on basis of participant characteristics.");
-
     string first = expdb.participant.get_enum_field("first_side");
 
     if (first != "left" && first != "right") {
@@ -180,7 +173,7 @@ prepare_test_items() {
 
     string grammar_first = expdb.participant.get_enum_field("first_grammar");
 
-    while (i < 0) {
+    while (i < NUM_TEST_TRIALS) {
         bool is_even = i % 2 == 0;
         bool is_odd = i % 2 == 1;
 
