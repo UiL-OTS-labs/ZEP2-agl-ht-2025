@@ -19,7 +19,8 @@ int create_participant_fields()
     expdb.participant.add_field("gender");
     expdb.participant.add_field("birthdate");
     expdb.participant.add_field("language");
-    expdb.participant.add_field("testorder");
+    expdb.participant.add_field("first_side");
+    expdb.participant.add_field("first_grammar");
 
     return OK;
 }
@@ -35,11 +36,15 @@ string[] valid_language = {
     "l2",
 };
 
-string[] valid_test_order = {
-    "O1",
-    "O2",
-    "O3",
-    "O4",
+
+string[] valid_first_side = {
+    "left",
+    "right"
+};
+
+string[] valid_first_grammar = {
+    "grammatical",
+    "ungrammatical"
 };
 
 
@@ -67,7 +72,6 @@ int check_enum_field_in_array(string[] array, string field, string variable) {
             return OK;
         i++;
     }
-
     
     string error = "The value " + field + " is invalid for \"" + variable;
     error += "\"\n\tValid values: " + valid_values(array) + "\n";
@@ -101,11 +105,21 @@ int check_participant_fields()
     if (status != OK)
         return status;
     
-    string testorder = expdb.participant.get_enum_field("testorder");
+    string first_side = expdb.participant.get_enum_field("first_side");
     status = check_enum_field_in_array(
-        valid_test_order,
-        testorder,
-        "testorder"
+        valid_first_side,
+        first_side,
+        "first_side"
     );
+    if (status != OK)
+        return status;
+    
+    string first_grammar = expdb.participant.get_enum_field("first_grammar");
+    status = check_enum_field_in_array(
+        valid_first_grammar,
+        first_grammar,
+        "first_grammar"
+    );
+
     return status;
 }

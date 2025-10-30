@@ -15,16 +15,15 @@ HISTORY:
 \******************************************************************************/
 
 
-// Maximum number of successive visual stimuli to appear on the same side.
-const int       MAX_SAME_SIDE                   = 2;
-
-// Maximum number of subtrials in test trials.
-const int       MAX_TEST_SUBTRIALS              = 1;
-
 // Maximum duration the child may look away.
-const dur       MAX_LOOKAWAY_DURATION           = 2000ms;
+const dur MAX_LOOKAWAY_DURATION     = 2000ms;
 
 // Duration of the interval between two subtrials.
-const dur       INTERSTIMULUS_INTERVAL          = 650ms;
+const dur INTERSTIMULUS_INTERVAL    = 650ms;
 
-const int       MAX_REPETITIONS                 = 15;
+const int MAX_REPETITIONS           = 15;
+
+const int NUM_TEST_TRIALS           = 8;
+
+const int MAX_TEST_SUBTRIALS = 1; // examine necessity
+const int MAX_SAME_SIDE = 2; // examine necessity

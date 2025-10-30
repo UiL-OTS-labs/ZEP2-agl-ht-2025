@@ -1,0 +1,47 @@
+/******************************************************************************\
+  Small utility that print the items
+\******************************************************************************/
+
+requires 2.6;
+
+
+// Custom modules
+import baby_windows3;
+import familiarization::stimuli;
+import test::stimuli;
+
+
+// Experiment version. In piloting stage and later increment this on each
+// relevant change.
+const int EXPERIMENT_VERSION = 1;
+
+
+Experiment experiment
+{
+    on_event:entry()
+    {
+        int status = familiarization::load_stimuli();
+        if (status != OK) {
+            print_error("Unable to load familiarization stimuli\n");
+            flush_error();
+        }
+
+        status = test::load_stimuli();
+        if (status != OK) {
+            print_error("Unable to load test stimuli\n");
+            flush_error();
+        }
+
+        println("fam_items:");
+        int i = 0;
+        while (i < familiarization::fam_items.size) {
+            print_test_items(familiarization::fam_items[i]);
+            i++;
+        }
+
+        println("\ntest_items:");
+        print_test_items(test::test_items);
+ 
+        terminate;
+    }
+}
