@@ -35,5 +35,7 @@ const dur       ISI                             = 500ms;
 
 const dur       SILENCE_DUR                     = 1900ms;
 
+const dur       INTER_ATTENTION_TRIAL           = 2000ms;
+
 // // Duration between the start of two consecutive trials
 // const dur       INTER_STIMULUS_ONSET_INTERVAL   = 4s;
