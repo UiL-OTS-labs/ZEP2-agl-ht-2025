@@ -251,6 +251,8 @@ State fam_handler
         control.enable_key(KEY_Escape, RESPONSE_HALT);
 
         control.reset_clock();
+
+        this.enter();
     }
 
     // Performs cleaning up if necessary.
@@ -286,9 +288,10 @@ State fam_handler
         test_window3.show_page(test::right_page);
 
         // Update status line on control window. Cleared in done() above.
-        audio.play(tref + ISI);
+        audio.play(tref + INTER_ATTENTION_TRIAL + ISI);
         
-        enter();
+        // We enter in setup because than the visual stimulus is started directly
+        // enter();
 
         // Remember who to signal when the trial is over.
         target = caller;

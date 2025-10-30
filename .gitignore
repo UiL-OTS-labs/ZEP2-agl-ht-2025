@@ -10,3 +10,6 @@ db/
 
 # python virtual env
 venv 
+
+# docs
+inf_*pdf
