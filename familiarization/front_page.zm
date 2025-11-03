@@ -45,10 +45,10 @@ Page front_page
                 init()
                 {
                     string image_fn = stimuli_dir() + "images/";
-                    image_fn += "doll" + ".png";
+                    image_fn += "vortex" + ".png";
                     image = image_fn;
                     real ratio = image_height / image_width;
-                    width = canvas.width / 4;
+                    width = canvas.width / 1;
                     height= width * ratio;
                     x = -width/2;
                     y = -height/2;
