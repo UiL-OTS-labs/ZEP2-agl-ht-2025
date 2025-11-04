@@ -29,6 +29,39 @@ int find_string_index(string[] haystack, string needle) {
     return ret;
 }
 
+TestType[] shuffle_order = {
+    TT_GRAMMATICAL,
+    TT_GRAMMATICAL,
+    TT_GRAMMATICAL,
+    TT_GRAMMATICAL,
+    TT_UNGRAMMATICAL,
+    TT_UNGRAMMATICAL,
+    TT_UNGRAMMATICAL,
+    TT_UNGRAMMATICAL
+}
+
+int test_type_max_consecutive() {
+    int max_num_consecutive = 1;
+    int num_consecutive = 1;
+    int i = 1;
+
+    while(i < shuffle_order.size) {
+        if (shuffle_order[i] == shuffle_order[i-1]) {
+            num_consecutive++;
+            if (num_consecutive > max_num_consecutive) {
+                max_num_consecutive = num_consecutive;
+            }
+        }
+        else {
+            num_consecutive = 1;
+        }
+        i++;
+    }
+
+    return max_num_consecutive;
+}
+
+
 LanguageType determine_language(string stimulus) {
     LanguageType ret = LANGUAGE_NOT_SPECIFIED;
     if (find_string_index(l1_stimuli, stimulus) != -1) {
@@ -165,37 +198,35 @@ set_stimulus_direction() {
 
 void
 prepare_test_items() {
-    int i = 0;
     string GRAMMATICAL = "grammatical";
     string UNGRAMMATICAL = "ungrammatical";
 
     string grammar_first = expdb.participant.get_enum_field("first_grammar");
 
+    println("shuffeling, " + grammar_first + " ncons = " + test_type_max_consecutive());
+    while ((grammar_first == GRAMMATICAL && shuffle_order[0] != TT_GRAMMATICAL) 
+        || (grammar_first == UNGRAMMATICAL && shuffle_order[0] != TT_UNGRAMMATICAL)
+        || (test_type_max_consecutive() != 2)) {
+        println("shuffeling");
+        shuffle_order.shuffle(0, -1);
+    } 
+
+    int i = 0;
     while (i < NUM_TEST_TRIALS) {
-        bool is_even = i % 2 == 0;
-        bool is_odd = i % 2 == 1;
-
         TestItem item;
-
-        if (is_even && grammar_first == GRAMMATICAL) {
+        if (shuffle_order[i] == TT_GRAMMATICAL) {
             item = create_grammatical();
         }
-        else if(is_odd && grammar_first == GRAMMATICAL) {
+        else if (shuffle_order[i] == TT_UNGRAMMATICAL) {
             item = create_ungrammatical();
         }
-        else if(is_even && grammar_first == UNGRAMMATICAL) {
-            item = create_ungrammatical();
-        }
-        else if(is_odd && grammar_first == UNGRAMMATICAL) {
-            item = create_grammatical();
-        }
-        else{
-            print_error(
-                "Oops unexpected parameters for choosing stimuli based on grammar\n"
-            );
+        else {
+            print_error("Oops test items ain't grammatical nor ungrammatical");
+            flush_error();
         }
 
         append_test_item(test_items, item);
+
         i++;
     }
     if (test_items.size != NUM_TEST_TRIALS) {
