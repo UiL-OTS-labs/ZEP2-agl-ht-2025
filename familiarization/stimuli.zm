@@ -223,6 +223,38 @@ bool check_odd_not_at_the_start_or_end() {
     return true;
 }
 
+bool check_not_to_many_consequtive_dependencies() {
+    int i = 3;
+    // A x B
+    // A and B can both be 2 syllables of say A1 A2, B1 and B2
+    // we check whether there are not to much repetitions of A1 B1 in a row
+
+    while (i < temp_fam_items.size) {
+        string s0 = temp_fam_items[i - 3].sndfn;
+        string s1 = temp_fam_items[i - 2].sndfn;
+        string s2 = temp_fam_items[i - 1].sndfn;
+        string s3 = temp_fam_items[i - 0].sndfn;
+
+        string A0 = token(s0, "_", 0);
+        string A1 = token(s1, "_", 0);
+        string A2 = token(s2, "_", 0);
+        string A3 = token(s3, "_", 0);
+        
+        string B0 = token(s0, "_", 2);
+        string B1 = token(s1, "_", 2);
+        string B2 = token(s2, "_", 2);
+        string B3 = token(s3, "_", 2);
+
+        if (A0 == A1 && A0 == A2 && A0 == A3 &&
+            B0 == B1 && B0 == B2 && B0 == B3) {
+            return false; // four times in a row is not allowed
+        }
+
+        i++;
+    }
+    return true;
+}
+
 bool check_fam_stim_rules() {
     TestItem[] linearized = {};
     int i = 0;
@@ -248,6 +280,9 @@ bool check_fam_stim_rules() {
         return false;
     
     if (!check_odd_not_at_the_start_or_end())
+        return false;
+
+    if (!check_not_to_many_consequtive_dependencies())
         return false;
     
     return true;
