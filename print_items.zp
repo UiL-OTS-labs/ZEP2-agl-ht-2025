@@ -2,7 +2,7 @@
   Small utility that print the items
 \******************************************************************************/
 
-requires 2.6;
+requires 2.7;
 
 
 // Custom modules
