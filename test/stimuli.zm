@@ -203,11 +203,9 @@ prepare_test_items() {
 
     string grammar_first = expdb.participant.get_enum_field("first_grammar");
 
-    println("shuffeling, " + grammar_first + " ncons = " + test_type_max_consecutive());
     while ((grammar_first == GRAMMATICAL && shuffle_order[0] != TT_GRAMMATICAL) 
         || (grammar_first == UNGRAMMATICAL && shuffle_order[0] != TT_UNGRAMMATICAL)
         || (test_type_max_consecutive() != 2)) {
-        println("shuffeling");
         shuffle_order.shuffle(0, -1);
     } 
 
