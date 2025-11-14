@@ -268,6 +268,10 @@ Page control
 
                 counter_background.offset_x = counter_active.offset_x - counter_active.radius - 5;
                 counter_background.offset_y = counter.offset_y;
+
+                // Put sample percentage in lower left corner.
+                valid_gaze.offset_x = actual_width * .1;
+                valid_gaze.offset_y = actual_height* .9;
             }
 
             ImageShape thumbnail_window1
@@ -428,6 +432,19 @@ Page control
                     hor_alignment = ALIGN_END;
                     line_pattern_color = CONTROL_COUNTER_COLOR;
                     is_visible = true;
+                }
+            }
+
+            TextShape valid_gaze
+            {
+                init()
+                {
+                    font_family = CONTROL_COUNTER_FONT_FAMILY;
+                    font_size = CONTROL_COUNTER_FONT_SIZE;
+                    hor_alignment = ALIGN_END;
+                    line_pattern_color = CONTROL_COUNTER_COLOR;
+                    is_visible = true;
+                    text = "";
                 }
             }
         }
@@ -2654,7 +2671,23 @@ Page control
 
         return clock.duration;
     }
+    
+    //--------------------------------------------------------------------------
 
+    void enable_valid_gaze()
+    {
+        layout.canvas.valid_gaze.is_visible = true;
+    }
+    
+    void disable_valid_gaze()
+    {
+        layout.canvas.valid_gaze.is_visible = false;
+    }
+
+    void set_valid_gaze(int percentage) {
+        string spercentage = "" + percentage;
+        layout.canvas.valid_gaze.text = spercentage;
+    }
 
     //--------------------------------------------------------------------------
 

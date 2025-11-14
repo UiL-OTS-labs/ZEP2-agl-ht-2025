@@ -30,9 +30,14 @@ enum EyeTrkMessage
     RECORDING_DONE,
 }
 
+const int NUM_SAMPLES = 1000;
+
 
 EyeTracker eyetracker
 {
+    int nth_gaze_sample;
+    int valid_gaze;
+
     void setup()
     {
         // Link to eye-tracker device interface. This device produces our
@@ -244,6 +249,12 @@ EyeTracker eyetracker
     {
         // Reported eye positions are relative to the test window.
 
+        if (gaze_x != 0 && gaze_y != 0) {
+            // assume 0, 0 is an invalid gaze sample
+            valid_gaze++;
+        }
+
+
         if (!eye_data_ignore_or_no_eyes)
         {
             control.show_gaze(
@@ -253,6 +264,16 @@ EyeTracker eyetracker
         else
         {
             control.hide_gaze();
+        }
+        
+        nth_gaze_sample++;
+        if (nth_gaze_sample == NUM_SAMPLES) {
+
+            int percentage = valid_gaze * 100 / NUM_SAMPLES;
+            control.set_valid_gaze(percentage);
+            
+            valid_gaze = 0;
+            nth_gaze_sample = 0;
         }
     }
 
