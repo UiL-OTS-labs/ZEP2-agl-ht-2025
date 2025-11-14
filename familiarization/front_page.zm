@@ -13,6 +13,7 @@ HISTORY:
 
 \******************************************************************************/
 
+import spiral_size;
 
 Page front_page
 {
@@ -48,7 +49,7 @@ Page front_page
                     image_fn += "vortex" + ".png";
                     image = image_fn;
                     real ratio = image_height / image_width;
-                    width = canvas.width / 1;
+                    width = canvas.width * SPIRAL_SCALE;
                     height= width * ratio;
                     x = -width/2;
                     y = -height/2;
