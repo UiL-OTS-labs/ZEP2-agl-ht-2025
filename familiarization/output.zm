@@ -3,8 +3,9 @@
 // familiarization phase.
 record FamStimOutput
 {
-    int         trial;  // The nth fam stimulus
-    int         id;     // the id of the stimulus
+    int         trial;      // The nth fam stimulus
+    int         id;         // the id of the stimulus
+    int         block_num;  // the nth_block
 
     LanguageType language;
     string      stimulus;
@@ -27,6 +28,8 @@ void fam_stim_output_append(FamStimOutput data)
         "identifies stimulus");
     expdb.set_trial_data_int_field("id", data.id,
         "identifies stimulus");
+    expdb.set_trial_data_int_field("block_num", data.block_num,
+        "The nth block");
 
     expdb.set_trial_data_string_field("stimulus", data.stimulus,
         "the name of the sound file that was playing");

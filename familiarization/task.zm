@@ -127,6 +127,9 @@ Block task
         {
             entry() {
                 num_cycles = NUM_FAM_BLOCKS;
+                if (have_flag("short")) {
+                    num_cycles = 2;
+                }
             }
 
             Trial attention {

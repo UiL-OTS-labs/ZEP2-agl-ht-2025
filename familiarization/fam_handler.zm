@@ -158,11 +158,13 @@ State fam_handler
 
             eyetracker.print_to_data_file("end_phase");
             eyetracker.print_to_data_file("end_trial");
-
+            
             out.trial = nth_stimulus + 1;
+            out.block_num = fam_handler.block_num;
             out.id = item.id;
             out.language = item.language;
             out.sound_direction = string(item.sound_direction);
+            out.stimulus = item.sndfn;
             out.ms_start = int(audio.start_time - zero_time());
             out.ms_stop = int(audio.finish_time - zero_time());
 
