@@ -52,7 +52,7 @@ SummaryTrialOutput generate_summary(TestItem item, Direction sound_direction)
     SummaryTrialOutput trial_output;
     trial_output.language_type    = item.language;
     trial_output.test_type        = item.test_type;
-    trial_output.stimulus         = substring(item.sndfn, 0, item.sndfn.length-4);
+    trial_output.stimulus         = item.sndfn;
 
     trial_output.id               = item.id;
 
