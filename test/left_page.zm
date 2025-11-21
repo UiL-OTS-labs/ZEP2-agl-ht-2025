@@ -13,6 +13,7 @@ HISTORY:
 
 \******************************************************************************/
 
+import spiral_size;
 
 Page left_page
 {
@@ -35,7 +36,6 @@ Page left_page
         {
             init()
             {
-//                fill_pattern_color = TEST_PAGE_STIMULUS_COLOR;
                 size = 800, 800;
                 offset_x = width / 2;
                 offset_y = height / 2;
@@ -47,10 +47,10 @@ Page left_page
                 init()
                 {
                     string image_fn = stimuli_dir() + "images/";
-                    image_fn += "doll" + ".png";
+                    image_fn += "vortex.png";
                     image = image_fn;
                     real ratio = image_height / image_width;
-                    width = canvas.width / 4;
+                    width = canvas.width * SPIRAL_SCALE;
                     height= width * ratio;
                     x = -width/2;
                     y = -height/2;
