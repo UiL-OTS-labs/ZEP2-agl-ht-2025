@@ -957,7 +957,7 @@ void position_test_windows(bool home=false)
         test_window2.is_fullscreen = true;
         test_window1.target_head = TEST_WINDOW1_TARGET_HEAD;
         test_window1.virtual_size = 0, 0;
-        test_window1.is_fullscreen = false;
+        test_window1.is_fullscreen = true;
 
         ctrl_window.target_head = CTRL_WINDOW_TARGET_HEAD;
         ctrl_window.is_fullscreen = true;
