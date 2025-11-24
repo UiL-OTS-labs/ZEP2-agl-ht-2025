@@ -874,8 +874,8 @@ void show_test_windows()
 
     // Setting these parameters only have effect after the window has been
     // shown
-    test_window1.size = 1100, 800;
-    test_window1.x = (1920 - 1100) /2;
+    test_window1.size = 1150, 900;
+    test_window1.x = (1920 - 1150) /2 - 25;
     test_window1.y = 0;  
 
     ctrl_window.hide();
