@@ -89,7 +89,7 @@ Block task
 
             if (!have_flag("no-et")) {
 
-                eyetracker.open_data_file(fn, expdb.session.id);
+                eyetracker.open_data_file(fn);
 
                 eye_data_writer.file = fn;
 
